@@ -42,6 +42,8 @@ $$
 
 dove $Z(o,\theta)$ è la costante di normalizzazione, generalmente difficile da calcolare esattamente. IBC evita di stimarla sull'intero spazio continuo delle azioni attraverso un insieme finito di esempi negativi.
 
+![Implicit vs explicit policy](features/ibc_implicit_vs_explicit.png)
+
 ## Training con azioni negative
 
 Per ogni coppia positiva $(o_i,a_i)$ proveniente dalle dimostrazioni vengono campionate azioni negative $\tilde{a}_{i,j}$. Una loss di tipo **InfoNCE** deve assegnare all'azione dimostrata una probabilità maggiore rispetto ai controesempi:
@@ -97,5 +99,3 @@ Questa formulazione gestisce naturalmente azioni multimodali e discontinuità, d
 Training e inferenza richiedono di valutare numerose coppie osservazione-azione. La qualità dipende dalla copertura dei campioni negativi e dall'ottimizzatore usato per trovare i minimi; con action space molto ampi, la ricerca può diventare onerosa o mancare una modalità valida.
 
 IBC non risolve inoltre il covariate shift del behavioral cloning: la policy continua ad apprendere soltanto dagli stati visitati dall'esperto. Gli esperimenti reali sono task-specifici, con una singola piattaforma e senza linguaggio, e non dimostrano trasferimento cross-task o cross-embodiment.
-
-Il [paper originale](https://proceedings.mlr.press/v164/florence22a.html), il [sito del progetto](https://implicitbc.github.io/) e il [repository ufficiale](https://github.com/google-research/ibc) forniscono risultati, video e implementazione.
