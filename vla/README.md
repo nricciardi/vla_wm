@@ -36,7 +36,7 @@ La novelty consiste nell'**unificazione di modalità**, embodiment e action spac
 
 Il limite principale è che **il linguaggio non condiziona esplicitamente una policy robotica**: la robotica costituisce solo una parte del training e la generalizzazione vision-language-action rimane lontana da quella dei VLA successivi.
 
-L'[approfondimento su Gato](gato/README.md) descrive composizione dei dati, tokenizzazione e obiettivo di training.
+L'[approfondimento su Gato](models/gato/README.md) descrive composizione dei dati, tokenizzazione e obiettivo di training.
 
 
 ![Gato usa un unico modello per modalità, task ed embodiment differenti](figures/gato_overview.png)
@@ -63,9 +63,57 @@ La novelty è l'uso della conoscenza di un LLM per comporre skill robotiche tene
 
 La modularità è anche il limite principale: il language model può scegliere soltanto tra skill definite e addestrate in precedenza, mentre eventuali errori delle policy sottostanti si accumulano nell'esecuzione di task lunghi.
 
-L'[approfondimento su SayCan](saycan/README.md) ricostruisce il meccanismo di scoring, l'esecuzione iterativa e il setup sperimentale.
+L'[approfondimento su SayCan](models/saycan/README.md) ricostruisce il meccanismo di scoring, l'esecuzione iterativa e il setup sperimentale.
 
 ![Il mobile manipulator usato da SayCan e la sua osservazione RGB](figures/saycan_overview.png)
+
+## Policy visuomotorie da imitation learning
+
+Prima che i VLA integrassero linguaggio, visione e controllo su larga scala, una linea di ricerca complementare ha studiato **come rappresentare distribuzioni di azioni complesse** e come ridurre l'accumulo degli errori nel behavioral cloning. IBC e ACT non sono VLA in senso stretto, ma introducono principi riutilizzati nella progettazione delle action head e delle policy robotiche successive.
+
+### IBC (2021)
+
+**Implicit Behavioral Cloning (IBC)** sostituisce la regressione diretta dell'azione con un **energy-based model**. Invece di produrre immediatamente $a_t$ da $o_t$, la rete assegna un'energia $E_\theta(o_t,a)$ alle azioni candidate e seleziona quella con energia minima:
+
+$$
+\hat{a}_t = \arg\min_{a \in \mathcal{A}} E_\theta(o_t,a),
+$$
+
+dove $\mathcal{A}$ è lo spazio delle azioni ed $E_\theta$ è la funzione appresa con parametri $\theta$. Questa formulazione può rappresentare meglio dimostrazioni multimodali o mapping discontinui, nei quali più azioni diverse risultano valide per la stessa osservazione.
+
+Gli esperimenti comprendono task D4RL con dimostrazioni umane, ambienti simulati di pushing e sweeping e quattro task reali eseguiti da un **xArm6** con end-effector cilindrico. Per i task reali vengono raccolte da 95 a 502 dimostrazioni teleoperate e la policy riceve soltanto immagini RGB prospettiche a 5 Hz.
+
+#### Novelty
+
+La novelty consiste nel formulare il behavioral cloning come **regressione implicita condizionale**: la policy apprende la compatibilità tra osservazione e azione, anziché comprimere l'intera distribuzione delle dimostrazioni in un singolo output prodotto per regressione.
+
+#### Limiti
+
+La scelta dell'azione richiede un processo di ottimizzazione o campionamento nello spazio $\mathcal{A}$. Training e inferenza sono quindi più costosi di una policy feed-forward esplicita e la difficoltà cresce con dimensionalità e vincoli dell'action space. IBC non usa inoltre istruzioni linguistiche e viene addestrato separatamente per i task considerati.
+
+L'[approfondimento su IBC](models/ibc/README.md) sviluppa energy-based modeling, negative sampling, inferenza e risultati simulati e real-world.
+
+### ACT (2023)
+
+**Action Chunking with Transformers (ACT)** è una policy di imitation learning introdotta insieme alla piattaforma bimanuale ALOHA. A partire dalle immagini di quattro camere e dalle posizioni articolari correnti, predice un **chunk di azioni future** invece della sola azione successiva:
+
+$$
+\pi_\theta(a_{t:t+k-1}\mid o_t),
+$$
+
+dove $k$ è la lunghezza del chunk. Durante l'esecuzione, chunk sovrapposti forniscono più predizioni per lo stesso istante e un *temporal ensemble* le combina per ottenere movimenti più fluidi.
+
+ACT è valutato su due task simulati e sei task reali di manipolazione bimanuale fine. Le dimostrazioni sono raccolte con ALOHA, un sistema leader-follower formato da due bracci per l'operatore e due bracci follower a 7 DoF; l'action space della policy contiene quindi 14 target articolari. Il lavoro mostra che circa dieci minuti di dimostrazioni possono essere sufficienti per alcuni task contact-rich, come inserire una batteria o aprire un contenitore.
+
+#### Novelty
+
+La novelty è la combinazione di **action chunking, Transformer, conditional VAE e temporal ensembling**. Il chunking riduce l'orizzonte decisionale effettivo, mentre la variabile latente modella la variabilità delle dimostrazioni umane e l'ensemble temporale attenua le discontinuità tra pianificazioni successive.
+
+#### Limiti
+
+ACT viene addestrato da zero e separatamente per ciascun task del lavoro originario. Non riceve un'istruzione linguistica, non trasferisce automaticamente skill tra task e rimane legato alle osservazioni e all'action space articolare di ALOHA. Chunk molto lunghi riducono inoltre la reattività alle nuove osservazioni, mentre chunk brevi recuperano parte dei problemi del behavioral cloning step-by-step.
+
+L'[approfondimento su ACT](models/act/README.md) descrive dataset, architettura CVAE, action chunking, temporal ensembling ed evaluation su ALOHA.
 
 ## Dalle skill modulari alle policy end-to-end
 
@@ -87,7 +135,7 @@ I limiti derivano dal **behavioral cloning**, dalla quantizzazione e dalla conos
 
 Le prestazioni diminuiscono sensibilmente quando cambiano background, oggetti o configurazioni.
 
-L'[approfondimento su RT-1](rt1/README.md) presenta dataset, architettura FiLM-EfficientNet/TokenLearner, action space, training ed evaluation.
+L'[approfondimento su RT-1](models/rt1/README.md) presenta dataset, architettura FiLM-EfficientNet/TokenLearner, action space, training ed evaluation.
 
 
 ![RT-1 trasforma istruzione e storia di immagini in token di azione](figures/rt1_full_model.png)
@@ -114,7 +162,7 @@ Il web amplia la conoscenza semantica ma **non crea nuove primitive motorie**, m
 
 Il decoding autoregressivo di modelli molto grandi limita il controllo a circa 1–3 Hz e il dataset motorio resta prevalentemente legato a un solo embodiment.
 
-L'[approfondimento su RT-2](rt2/README.md) sviluppa tokenizzazione, co-fine-tuning, constrained decoding, controllo closed loop ed esperimenti di generalizzazione.
+L'[approfondimento su RT-2](models/rt2/README.md) sviluppa tokenizzazione, co-fine-tuning, constrained decoding, controllo closed loop ed esperimenti di generalizzazione.
 
 
 ## Cross-embodiment VLA
@@ -137,7 +185,7 @@ dove $o_{\leq t}$ rappresenta la storia delle osservazioni fino al tempo $t$, $q
 
 I diversi lavori differiscono soprattutto nel modo in cui rendono confrontabili dati eterogenei, nel tipo di backbone utilizzato per collegare percezione e linguaggio e nella rappresentazione con cui vengono generate le azioni.
 
-L'evoluzione della linea di ricerca può essere letta come un passaggio da **dataset unificati e action space standardizzati**, come [Open X-Embodiment](#open-x-embodiment) e RT-X, verso policy generaliste progettate esplicitamente per essere riadattate, come Octo, e successivamente verso veri **Vision-Language-Action foundation model**, come OpenVLA, $\pi_0$ e GR00T, nei quali conoscenza semantica pre-addestrata e generazione di azioni continue vengono integrate sempre più strettamente.
+L'evoluzione della linea di ricerca può essere letta come un passaggio da **dataset unificati e action space standardizzati**, come [Open X-Embodiment](datasets/README.md#open-x-embodiment) e RT-X, verso policy generaliste progettate esplicitamente per essere riadattate, come Octo, e successivamente verso veri **Vision-Language-Action foundation model**, come OpenVLA, $\pi_0$ e GR00T, nei quali conoscenza semantica pre-addestrata e generazione di azioni continue vengono integrate sempre più strettamente.
 
 
 ### RT-X (2023)
@@ -164,7 +212,7 @@ RT-X dipende da una **forte normalizzazione delle azioni e non risolve in modo g
 
 RT-2-X presenta inoltre i costi tipici dei grandi VLA autoregressivi: la capacità semantica cresce con la scala del backbone, ma aumentano anche memoria, costo di training e costo di inferenza. La rappresentazione discreta delle azioni attraverso token costituisce infine una scelta progettuale diversa dalle successive policy generative continue basate su diffusion o flow matching.
 
-L'architettura, la costruzione del mixture e il confronto tra RT-1-X e RT-2-X sono sviluppati in [RT-X](./rtx/README.md).
+L'architettura, la costruzione del mixture e il confronto tra RT-1-X e RT-2-X sono sviluppati in [RT-X](models/rtx/README.md).
 
 
 ### Octo
@@ -179,6 +227,8 @@ Il task può essere specificato attraverso **linguaggio naturale oppure goal ima
 
 Questo design rende Octo particolarmente interessante come **pretrained policy initialization**. Il modello non deve necessariamente risolvere zero-shot ogni nuovo robot; l'obiettivo è fornire una rappresentazione e una policy di partenza che possano essere adattate rapidamente a nuove camere, segnali propriocettivi e action space con una quantità relativamente ridotta di dati target.
 
+![Overview](figures/octo_architecture.png)
+
 #### Novelty
 
 La novità principale di Octo è la combinazione tra **pre-training cross-embodiment e modularità dell'interfaccia**. Il modello è esplicitamente progettato affinché nuovi input o nuovi action head possano essere introdotti senza ricostruire l'intera policy da zero.
@@ -190,9 +240,6 @@ Octo mostra un percorso alternativo ai VLA molto grandi: una policy relativament
 Octo rimane fortemente dipendente dalla distribuzione dei dati di robot manipulation su cui viene pre-addestrato. Il modello può adattarsi a nuovi embodiment, ma tale adattamento richiede normalmente **dati del robot target e fine-tuning**; non equivale quindi a un controller universale capace di controllare direttamente qualsiasi piattaforma.
 
 La policy possiede inoltre una componente semantica meno ampia rispetto ai VLA costruiti a partire da grandi VLM pre-addestrati su Internet. Questo trade-off tra dimensione, apertura, adattabilità e conoscenza semantica costituisce uno dei punti di confronto principali con OpenVLA e con i modelli successivi.
-
-L'architettura Transformer, il diffusion readout e la strategia di fine-tuning sono approfonditi in [Octo](./octo/README.md).
-
 
 ### OpenVLA
 
@@ -209,33 +256,44 @@ L'architettura Transformer, il diffusion readout e la strategia di fine-tuning s
 
 ## Dataset per VLA
 
+I dataset determinano quali oggetti, ambienti, skill ed embodiment una policy può osservare durante il training.
+
+Una traiettoria robotica associa tipicamente una sequenza di osservazioni $o_t$, un'istruzione linguistica $q$ e le azioni $a_t$ eseguite dal robot.
+
+La quantità di dati è importante, ma non sostituisce la varietà delle situazioni né la qualità delle dimostrazioni.
+
+### Dataset real-world generalisti
+
+Questa famiglia comprende raccolte ottenute su robot fisici e mixture costruiti per superare il singolo laboratorio o il singolo task.
+
+**Open X-Embodiment** aggrega dataset eterogenei in un formato comune.
+
+**DROID**, **BridgeData V2**, **RH20T** e **RoboSet** privilegiano, con scale e sensori diversi, la varietà delle dimostrazioni reali.
+
+**AgiBot World/Colosseo** sposta ulteriormente la scala della raccolta bimanuale.
 
 
-### Open X-Embodiment (2023)
+L'[approfondimento sui dataset per VLA](datasets/README.md#dataset-real-world-generalisti) confronta origine dei dati, robot, copertura, accessibilità e principali limiti.
 
-**Open X-Embodiment** è soprattutto un'iniziativa di **data aggregation e standardizzazione**. 
+### Dataset simulati
 
-Il progetto nasce dalla constatazione che la robotica dispone di molti dataset relativamente piccoli, raccolti da laboratori differenti e con robot, sensori, task e formati incompatibili. Invece di trattare ciascun dataset come un dominio isolato, Open X-Embodiment costruisce un grande insieme comune con cui studiare se l'esperienza acquisita da un embodiment possa migliorare il controllo di altri robot.
+I dataset simulati sono prodotti attraverso infrastrutture che controllano scene, fisica, sensori e procedure di raccolta. **NVIDIA Isaac Sim e Replicator** generano osservazioni annotate e variazioni percettive; **Isaac Lab** aggiunge ambienti vettorializzati e pipeline di robot learning; **Isaac Lab Mimic** e **MimicGen** ampliano poche dimostrazioni ricombinandone i segmenti in nuove configurazioni. **robosuite/MuJoCo** e **Genesis** rappresentano ulteriori basi per creare traiettorie sintetiche.
 
-Open X-Embodiment aggrega dati provenienti da **22 embodiment robotici** e 21 istituzioni, includendo 527 skill e oltre un milione di traiettorie nella release del dataset. Sono presenti manipolatori singoli, sistemi bimanuali e piattaforme con caratteristiche cinematiche differenti..
+L'[approfondimento sui dataset per VLA](datasets/README.md#dataset-simulati-e-pipeline-di-generazione) distingue il simulatore dal corpus effettivamente generato e descrive quali informazioni servono per rendere riproducibile una raccolta sintetica.
 
-Uno dei problemi centrali è la **diversa semantica delle azioni**. Per rendere possibile il co-training, il lavoro converte dove possibile il controllo in una **rappresentazione comune *riferita all'end-effector***, descritta attraverso traslazione, rotazione e apertura della pinza. Questa scelta permette di condividere una parte significativa della struttura del controllo tra manipolatori diversi, ma implica anche che robot con modalità di attuazione radicalmente differenti siano più difficili da includere nello stesso schema.
+### Dataset più specifici
 
-![Examples](figures/open_x_example.webp)
+Alcuni dati sono preziosi proprio perché restringono il problema. I dataset **ALOHA/ACT** osservano coordinazione bimanuale e interazioni contact-rich; i **dataset per umanoidi** devono includere locomozione, equilibrio e controllo whole-body; i **video umani** forniscono grande varietà semantica senza azioni robotiche direttamente eseguibili; i **video egocentrici** avvicinano il punto di vista a quello di un agente incorporato, ma non eliminano l'embodiment gap.
 
-![Dataset](figures/open_x_dataset.webp)
+L'[approfondimento sui dataset per VLA](datasets/README.md#dataset-più-specifici) descrive queste sorgenti e il modo in cui possono integrare, senza sostituirle direttamente, le traiettorie robotiche.
 
-#### Novelty
 
-La principale novità è aver trasformato il cross-embodiment learning da un'ipotesi studiata su poche piattaforme a un problema affrontabile su scala molto più ampia.
+## Benchmark per VLA
 
-Open X-Embodiment introduce un'infrastruttura che sarà riutilizzata da numerosi lavori successivi. Octo e OpenVLA, per esempio, vengono pre-addestrati su subset o rielaborazioni di questo corpus, rendendo Open X-Embodiment un elemento fondamentale nella transizione verso i robot foundation model.
+### Benchmark simulati
 
-#### Limiti
+I benchmark simulati rendono **ripetibili reset, perturbazioni e condizioni di successo**.
 
-L'unificazione non elimina completamente la dipendenza dall'embodiment. La **standardizzazione funziona meglio quando i robot condividono una struttura di controllo sufficientemente simile**, mentre sensori, attuatori o morfologie molto differenti richiedono trasformazioni ulteriori o non possono essere rappresentati senza perdita di informazione.
+In breve **LIBERO** privilegia il trasferimento tra fattori semantici, **CALVIN** la persistenza su sequenze di skill, **SimplerEnv** la correlazione sim-to-real, **RoboCasa** la composizionalità domestica, **RLBench** l'ampiezza dei task e **ManiSkill** la manipolazione fisica scalabile.
 
-Il paper mostra soprattutto positive transfer tra robot presenti nel mixture di training; **non dimostra invece che una singola policy possa controllare senza adattamento un embodiment arbitrario** mai osservato. 
-
-La **copertura** del dataset rimane inoltre fortemente **concentrata sulla manipolazione**, per cui il concetto di generalità va interpretato rispetto al dominio rappresentato dai dati.
-
+Dettagli specifici [qui](benchmark/README.md).
