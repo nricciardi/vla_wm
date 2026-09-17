@@ -1,8 +1,12 @@
 # OpenVLA
 
-**OpenVLA** è un Vision-Language-Action model open-source da 7 miliardi di parametri progettato per trasformare un VLM pre-addestrato in una policy robotica generalista. Il modello riceve un'immagine dell'ambiente e un'istruzione linguistica $q$, quindi genera una sequenza di token che viene decodificata nell'azione continua $a_t$.
+**OpenVLA** è un Vision-Language-Action model open-source da **7 miliardi** di parametri progettato per trasformare un VLM pre-addestrato in una policy robotica generalista. 
+
+Il modello riceve un'immagine dell'ambiente e un'istruzione linguistica $q$, quindi genera una sequenza di token che viene decodificata nell'azione continua $a_t$.
 
 Il contributo va letto rispetto a RT-2. Entrambi sfruttano la conoscenza semantica di un Vision-Language Model e rappresentano le azioni nello spazio dei token linguistici. OpenVLA rende però disponibili pesi, codice PyTorch, configurazioni di training e strumenti di fine-tuning, con l'obiettivo di offrire una base riproducibile per nuovi robot e dataset.
+
+![Overview](figures/openvla_overview.png)
 
 ## Dal VLM alla policy
 
@@ -16,9 +20,13 @@ $$
 \text{Llama 2 7B}.
 $$
 
-L'encoder visivo trasforma l'immagine $o_t$ in patch embedding. Il projector porta queste feature nella stessa dimensione degli embedding testuali di Llama, permettendo al language model di elaborare congiuntamente immagine e istruzione. Durante il robot pre-training, il target non è una risposta testuale ma la sequenza di token corrispondente all'azione dimostrata.
+L'encoder visivo trasforma l'immagine $o_t$ in patch embedding. 
 
-La formulazione rimane
+Il projector porta queste feature nella stessa dimensione degli embedding testuali di Llama, permettendo al language model di elaborare congiuntamente immagine e istruzione. 
+
+Durante il robot pre-training, il target non è una risposta testuale ma la sequenza di token corrispondente all'azione dimostrata.
+
+La formulazione rimane:
 
 $$
 \pi_\theta(a_t\mid o_t,q),
@@ -26,15 +34,22 @@ $$
 
 dove $\theta$ indica i parametri fine-tuned del VLA. La versione originaria usa una singola immagine per query e predice un solo step di controllo, che viene poi eseguito in closed loop acquisendo una nuova osservazione.
 
-## Fused visual encoder
+![Architecture](figures/openvla_architecture.png)
 
-Prismatic combina due Vision Transformer pre-addestrati: **DINOv2** e **SigLIP**. DINOv2, appreso con supervisione visuale self-supervised, fornisce feature utili per struttura, corrispondenze e geometria della scena. SigLIP è invece addestrato su coppie immagine-testo e privilegia l'allineamento semantico tra contenuto visuale e linguaggio.
+### Fused visual encoder
 
-Le feature dei due encoder vengono fuse prima del projector. L'intuizione è che il controllo robotico richieda entrambe le proprietà: distinguere semanticamente l'oggetto indicato da $q$ e conservare dettagli spaziali sufficienti per raggiungerlo e manipolarlo. Le ablation del lavoro mostrano che la scelta del visual backbone contribuisce in modo sostanziale alle prestazioni.
+Prismatic combina due Vision Transformer pre-addestrati: **DINOv2** e **SigLIP**.
+
+DINOv2, appreso con supervisione visuale self-supervised, fornisce feature utili per struttura, corrispondenze e geometria della scena. SigLIP è invece addestrato su coppie immagine-testo e privilegia l'allineamento semantico tra contenuto visuale e linguaggio.
+
+Le **feature dei due encoder vengono fuse prima del projector**. 
+
+L'intuizione è che il **controllo robotico richieda entrambe le proprietà**: **distinguere semanticamente l'oggetto** indicato da $q$ e **conservare dettagli spaziali** sufficienti per raggiungerlo e manipolarlo. Le ablation del lavoro mostrano che la scelta del visual backbone contribuisce in modo sostanziale alle prestazioni.
 
 Il visual encoder non determina comunque da solo l'azione. Le patch proiettate vengono elaborate dal backbone Llama insieme ai token linguistici, così che la rappresentazione finale dipenda dall'istruzione corrente.
 
-## Action tokenization
+
+### Action tokenization
 
 OpenVLA usa un action space canonico a sette componenti:
 
@@ -99,22 +114,14 @@ Aggiornare tutti i 7 miliardi di parametri richiede molta memoria. OpenVLA valut
 
 **Low-Rank Adaptation (LoRA)** inserisce invece matrici a rango ridotto nei layer del modello e aggiorna circa l'1,4% dei parametri. Nel protocollo studiato raggiunge prestazioni comparabili al full fine-tuning con un consumo di memoria molto inferiore. Il checkpoint può così essere adattato su hardware più accessibile, anche se raccolta dei dati, preprocessing e inferenza del modello da 7B restano costi rilevanti.
 
-## Rapporto con i modelli successivi
-
-OpenVLA rappresenta chiaramente la famiglia **web-pretrained VLM → robot policy**: conserva l'interfaccia autoregressiva del language model e inserisce le azioni nel suo vocabolario. Questa semplicità ha favorito riproducibilità e numerose estensioni.
-
-I lavori successivi intervengono soprattutto sui suoi colli di bottiglia. FAST comprime intere sequenze di azioni in meno token; OpenVLA-OFT usa action head continue e action chunking per aumentare frequenza e qualità del controllo; altri modelli sostituiscono il decoding discreto con diffusion o flow matching. Queste estensioni non cancellano il contributo di OpenVLA, ma mostrano che **backbone multimodale e action representation sono scelte separabili**.
-
-#### Novelty
-
-OpenVLA combina per la prima volta in una release ampiamente accessibile un VLM da 7B, un grande mixture Open X-Embodiment e una pipeline completa per addestramento e adattamento. La fusione DINOv2-SigLIP offre un prior visuale sia spaziale sia semantico, mentre l'action tokenizer permette di riutilizzare senza modifiche radicali l'output autoregressivo di Llama.
-
-Il contributo pratico è altrettanto importante: checkpoint, codice, configurazioni RLDS, esempi di deployment e supporto LoRA trasformano il modello in una base su cui confrontare nuove tecniche di action decoding e fine-tuning.
-
 #### Limiti
 
-La rappresentazione per-dimension e per-timestep non modella esplicitamente la struttura temporale del movimento. Quantizzazione e decoding autoregressivo limitano precisione e frequenza, specialmente per controllo bimanuale o ad alta dimensionalità.
+La rappresentazione per-dimension e per-timestep non modella esplicitamente la struttura temporale del movimento. 
 
-Il modello richiede inoltre risorse considerevoli e usa un backbone Llama 2 soggetto alla relativa licenza. Il fine-tuning solo robotico può erodere conoscenza web, mentre il successo out-of-the-box è più solido sugli embodiment presenti in OXE che su robot completamente nuovi. Infine, le prestazioni dipendono dalle statistiche usate per normalizzare e de-tokenizzare le azioni, che devono essere coerenti con il setup target.
+**Quantizzazione e decoding autoregressivo limitano precisione e frequenza**, specialmente per controllo bimanuale o ad alta dimensionalità.
 
-Il [paper OpenVLA](https://arxiv.org/abs/2406.09246), il [sito del progetto](https://openvla.github.io/) e il [repository ufficiale](https://github.com/openvla/openvla) raccolgono risultati, pesi e procedure di fine-tuning.
+Il modello richiede inoltre risorse considerevoli e usa un backbone Llama 2 soggetto alla relativa licenza. 
+
+Il **fine-tuning solo robotico può erodere conoscenza web**, mentre il successo out-of-the-box è più solido sugli embodiment presenti in OXE che su robot completamente nuovi. 
+
+Infine, le prestazioni dipendono dalle statistiche usate per normalizzare e de-tokenizzare le azioni, che devono essere coerenti con il setup target.

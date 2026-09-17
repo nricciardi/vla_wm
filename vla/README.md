@@ -261,13 +261,17 @@ Octo rimane fortemente dipendente dalla distribuzione dei dati di robot manipula
 
 La policy possiede inoltre una componente semantica meno ampia rispetto ai VLA costruiti a partire da grandi VLM pre-addestrati su Internet. Questo trade-off tra dimensione, apertura, adattabilità e conoscenza semantica costituisce uno dei punti di confronto principali con OpenVLA e con i modelli successivi.
 
-### OpenVLA
+### OpenVLA (2024)
 
-**OpenVLA (2024)** porta l'impostazione di RT-2 in un modello interamente aperto e progettato per il fine-tuning. Parte dal VLM **Prismatic-7B**, che combina encoder visuali DINOv2 e SigLIP con un backbone Llama 2 da 7 miliardi di parametri, e lo addestra a generare azioni robotiche come token discreti.
+**OpenVLA** porta l'impostazione di RT-2 in un modello interamente aperto e progettato per il fine-tuning. Parte dal VLM *Prismatic-7B*, che combina encoder visuali **DINOv2 e SigLIP** con un backbone **Llama 2** da 7 miliardi di parametri, e lo addestra a generare **azioni robotiche come token discreti**.
 
-Il training utilizza circa **970.000 traiettorie real-world** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti. Il modello viene valutato direttamente sui setup **WidowX** di BridgeData V2 e **Google Robot** della famiglia RT; viene inoltre adattato a due setup Franka, Franka-Tabletop a 5 Hz e Franka-DROID a 15 Hz.
+Il training utilizza circa **970.000 traiettorie *real-world*** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti. 
 
-Ogni componente continua dell'azione viene normalizzata, discretizzata in 256 bin e associata a uno dei token meno usati del vocabolario Llama. Il language model può così apprendere con lo stesso obiettivo autoregressivo la sequenza che rappresenta
+Il modello viene valutato direttamente sui setup *WidowX* di BridgeData V2 e *Google Robot* della famiglia RT; viene inoltre adattato a due setup Franka, Franka-Tabletop a 5 Hz e Franka-DROID a 15 Hz.
+
+Ogni componente continua dell'azione viene **normalizzata, discretizzata in 256 bin** e associata a uno dei token meno usati del vocabolario Llama. 
+
+Il language model può così apprendere con lo stesso **obiettivo autoregressivo** la sequenza che rappresenta:
 
 $$
 a_t=(\Delta x_t,\Delta y_t,\Delta z_t,
@@ -276,17 +280,23 @@ $$
 
 dove le prime sei componenti descrivono la variazione di posa dell'end-effector e $g_t$ il gripper.
 
+![Architecture](figures/openvla_architecture.png)
+
 #### Novelty
 
-OpenVLA offre una delle prime implementazioni **open-source e riproducibili di un VLA da 7B parametri**, includendo checkpoint, pipeline PyTorch, training su mixture RLDS e supporto al fine-tuning. La fusione di DINOv2 e SigLIP combina feature sensibili alla struttura spaziale con rappresentazioni allineate semanticamente al linguaggio.
+OpenVLA offre una delle prime implementazioni **open-source e riproducibili di un VLA da 7B parametri**, includendo checkpoint, pipeline PyTorch, training su mixture RLDS e supporto al fine-tuning. 
 
-Il modello mostra inoltre che una policy molto più piccola di RT-2-X può beneficiare congiuntamente del pre-training web del VLM e del pre-training su un grande corpus robotico. Con LoRA è possibile adattare soltanto una piccola frazione dei parametri mantenendo, nel protocollo studiato, prestazioni vicine al full fine-tuning.
+La **fusione di DINOv2 e SigLIP** combina feature sensibili alla struttura spaziale con rappresentazioni allineate semanticamente al linguaggio.
+
+Il modello mostra inoltre che una **policy molto più piccola di RT-2-X può beneficiare congiuntamente del pre-training web del VLM e del pre-training su un grande corpus robotico**. 
+
+Tramite LoRA è possibile adattare soltanto una piccola frazione dei parametri mantenendo, nel protocollo studiato, prestazioni vicine al full fine-tuning.
 
 #### Limiti
 
-La discretizzazione introduce errore di quantizzazione e la generazione autoregressiva di più token per ogni azione limita la frequenza di controllo. La versione originaria predice inoltre una singola azione per query, senza un action chunk temporale esplicito.
+La discretizzazione introduce errore di quantizzazione e la **generazione autoregressiva di più token per ogni azione limita la frequenza di controllo**. La versione originaria predice inoltre una **singola azione per query**, senza un action chunk temporale esplicito.
 
-Il fine-tuning del VLM esclusivamente sui robot data può degradare parte della conoscenza semantica acquisita sul web: RT-2-X, che mantiene il co-fine-tuning vision-language, rimane più forte su alcune richieste basate su concetti Internet molto lontani dai dati robotici. Dimensione e costo di inferenza restano infine elevati rispetto a policy robotiche specializzate.
+Il **fine-tuning del VLM esclusivamente sui robot data può degradare parte della conoscenza semantica acquisita sul web**: RT-2-X, che mantiene il co-fine-tuning vision-language, rimane più forte su alcune richieste basate su concetti Internet molto lontani dai dati robotici. Dimensione e costo di inferenza restano infine elevati rispetto a policy robotiche specializzate.
 
 L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prismatic, tokenizzazione delle azioni, training mixture, evaluation e adattamento tramite LoRA.
 
@@ -438,11 +448,38 @@ I benchmark simulati rendono **ripetibili reset, perturbazioni e condizioni di s
 
 In breve **LIBERO** privilegia il trasferimento tra fattori semantici, **CALVIN** la persistenza su sequenze di skill, **SimplerEnv** la correlazione sim-to-real, **RoboCasa** la composizionalità domestica, **RLBench** l'ampiezza dei task e **ManiSkill** la manipolazione fisica scalabile.
 
-Dettagli specifici [qui](benchmark/README.md).
+Dettagli specifici [qui](evaluation/README.md).
 
 
 ### RobotEval (2025)
 
+**RoboEval** è un framework di valutazione per la manipolazione bimanuale che affianca al *success rate* una descrizione strutturata della qualità dell'esecuzione. La prima release comprende otto task simulati, da operazioni relativamente brevi come sollevare un vassoio o ruotare una valvola fino ad attività multistadio come impacchettare oggetti, ciascuno proposto con variazioni controllate di posizione e orientamento. Il benchmark usa un embodiment a due bracci e mette a disposizione oltre 3.000 dimostrazioni esperte raccolte tramite teleoperazione in realtà virtuale, con osservazioni visive, propriocezione e stato annotato della scena.
+
+La valutazione separa **efficienza**, **sicurezza e stabilità**, **coordinazione bimanuale** ed **esito del task**. Lunghezze dei percorsi, tempo di completamento, jerk, collisioni, perdite della presa e disallineamento tra i due end-effector permettono di distinguere policy che hanno lo stesso successo binario ma movimenti molto diversi. Indicatori di avanzamento per stadi mostrano inoltre fin dove arriva una policy quando non conclude il task. Gli esperimenti confrontano ACT, Diffusion Policy, GR00T N1.6, X-VLA e $\pi_0.5$, usando le traiettorie umane come riferimento comportamentale.
+
+#### Novelty
+
+Il contributo distintivo consiste nel trattare la valutazione come un problema **multidimensionale e diagnostico**: il successo stabilisce se il goal è stato raggiunto, mentre le metriche comportamentali spiegano con quale efficienza, fluidità, stabilità e coordinazione. Il lavoro verifica empiricamente che tali misure siano complementari, discriminative tra policy e informative anche al variare della difficoltà spaziale.
+
+#### Limiti
+
+La release iniziale è interamente simulata, usa un solo setup bimanuale e varia soprattutto posizione e orientamento degli oggetti. Non copre ancora in modo sistematico illuminazione, distrattori, proprietà fisiche o trasferimento all'hardware reale; alcune metriche sono inoltre fortemente dipendenti dal task e una traiettoria più liscia non implica necessariamente un controllo più competente, come mostra il confronto tra policy e teleoperazione umana.
+
+L'[approfondimento su RoboEval](roboeval/README.md) descrive formalizzazione dei task, dataset, famiglie di metriche, protocollo sperimentale, risultati e limiti interpretativi del benchmark.
+
 
 ### RoboPlayground (2026)
 
+**RoboPlayground** propone di trasformare la costruzione di un benchmark da attività di programmazione riservata agli esperti a processo interattivo guidato dal linguaggio. Una richiesta testuale viene compilata in una specifica eseguibile che rende espliciti asset, distribuzione degli stati iniziali, predicato di successo, istruzione canonica e parafrasi. Il sistema non produce soltanto una scena isolata: genera una **famiglia versionata di task** in un dominio fisico strutturato di manipolazione di blocchi in MuJoCo, così che modifiche semantiche, visuali e comportamentali restino controllabili e riproducibili.
+
+La pipeline usa uno schema intermedio, generazione di codice assistita da esempi e API, controlli di fattibilità, validazione sintattica e fisica, agenti specializzati di riparazione e uno storico che collega ogni variante al task di origine. La valutazione comprende uno studio con 26 utenti, un confronto di sei policy addestrate sullo stesso insieme di dimostrazioni generate con CuTAMP e un'analisi della diversità dei task prodotti da autori differenti. Gli esperimenti mostrano che le perturbazioni comportamentali, come disfare e ricostruire una pila o rispettare una sequenza composizionale, espongono fallimenti non visibili sui task in-distribution.
+
+#### Novelty
+
+La novità non è soltanto usare un LLM per generare ambienti, ma fare del linguaggio una **interfaccia eseguibile e partecipativa per la valutazione**. RoboPlayground conserva lineage, condizioni di successo e distribuzioni iniziali, conciliando l'apertura a contributori non esperti con la necessità scientifica di rieseguire e confrontare le prove.
+
+#### Limiti
+
+L'istanza studiata è volutamente circoscritta a blocchi rigidi, una camera fissa e una configurazione MuJoCo standardizzata. La varietà linguistica non coincide quindi con varietà di oggetti, contatti o embodiment reali; inoltre la correttezza semantica dipende ancora da giudizi umani o da un valutatore LLM, mentre la validazione automatica garantisce soprattutto eseguibilità e stabilità del goal, non che ogni task generato sia significativo o che la soluzione sia raggiungibile da una policy concreta.
+
+L'[approfondimento su RoboPlayground](roboplayground/README.md) ricostruisce rappresentazione dei task, pipeline di compilazione e riparazione, steering contestuale, studio di usabilità, dati di training e risultati di generalizzazione.
