@@ -321,11 +321,9 @@ L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prism
 
 ## Tassonomia trasversale dei VLA
 
-La successione cronologica dei modelli non basta a descrivere il panorama dei VLA. Due sistemi contemporanei possono condividere lo stesso VLM ma differire completamente nel decoder delle azioni; viceversa, policy con action head simili possono nascere da strategie di pre-training diverse. È quindi utile organizzare i modelli lungo **assi indipendenti**, evitando di trasformare le categorie seguenti in una singola classifica.
-
 ### Rappresentazione delle azioni
 
-La rappresentazione dell'azione determina che cosa viene predetto dal modello e quale loss collega la rappresentazione multimodale al controllo.
+La rappresentazione dell'azione determina che **cosa viene predetto dal modello** e quale loss collega la rappresentazione multimodale al controllo.
 
 | Famiglia | Rappresentazione | Esempi | Conseguenza principale |
 | --- | --- | --- | --- |
@@ -336,7 +334,6 @@ La rappresentazione dell'azione determina che cosa viene predetto dal modello e 
 | **Diffusion action head** | Una sequenza continua viene ottenuta rimuovendo progressivamente rumore | Octo | Modella distribuzioni multimodali e action chunk, ma richiede più passi di denoising |
 | **Flow matching** | Il decoder apprende un campo di velocità che trasporta rumore verso una traiettoria di azioni | $\pi_0$, $\pi_{0.5}$, GR00T N1 | Produce chunk continui con pochi passi di integrazione, separando spesso il VLM dall'action expert |
 
-Queste famiglie possono essere combinate. Un VLM può ricevere supervisione da action token durante il pre-training e utilizzare un decoder continuo durante il post-training; allo stesso modo, “diffusion” descrive il meccanismo generativo, non il tipo di embodiment o di task conditioning.
 
 ### Modellazione temporale e action chunking
 
@@ -359,7 +356,7 @@ I VLA differiscono anche per il punto da cui nasce la policy. Le categorie sono 
 
 | Strategia | Punto di partenza | Modelli rappresentativi | Cosa viene trasferito |
 | --- | --- | --- | --- |
-| **Web-pretrained VLM → robot policy** | Un VLM già addestrato su immagini, testo o video viene adattato alle azioni | RT-2, OpenVLA, Gemini Robotics | Semantica, riconoscimento visuale e capacità linguistiche |
+| **Web-pretrained VLM to robot policy** | Un VLM già addestrato su immagini, testo o video viene adattato alle azioni | RT-2, OpenVLA, Gemini Robotics | Semantica, riconoscimento visuale e capacità linguistiche |
 | **Robot-data pretraining** | Una policy viene pre-addestrata direttamente su mixture di traiettorie | Octo | Primitive visuomotorie, dinamica locale e struttura degli action space |
 | **Pre-training ibrido** | VLM e action expert vengono combinati o co-addestrati con dati robotici e altre modalità | $\pi_0$, GR00T | Conoscenza semantica più prior motori continui e multi-embodiment |
 | **Downstream adaptation** | Un checkpoint generalista viene specializzato con poche dimostrazioni target | Octo, OpenVLA, $\pi_0$, GR00T | Nuovo task, sensore, action space o embodiment |
@@ -380,18 +377,23 @@ q,o_{\leq t}
 \text{low-level action decoding}
 $$
 
-Il **task decomposition** trasforma un obiettivo lungo in una catena di skill; la **subgoal prediction** produce uno stato intermedio, una frase o una rappresentazione latente; il **language planning** costruisce una sequenza simbolica; il controller low-level traduce infine il passo corrente in azioni. Ragionare prima dell'action decoding rende più leggibile la separazione tra “che cosa fare” e “come muoversi”, ma introduce latenza e nuovi punti di errore.
+- **Task decomposition** trasforma un obiettivo lungo in una catena di skill
+- **Subgoal prediction** produce uno stato intermedio, una frase o una rappresentazione latente
+- **Language planning** costruisce una sequenza simbolica
+- **Controller low-level** traduce infine il passo corrente in azioni. 
+
+Ragionare prima dell'action decoding rende più leggibile la separazione tra *"che cosa fare"* e *"come muoversi"*, ma introduce latenza e nuovi punti di errore.
+
+
+Tuttavia non ogni output testuale costituisce vero planning e non ogni action chunk implica reasoning.
 
 | Famiglia | Organizzazione del reasoning | Caratteristica |
 | --- | --- | --- |
-| **[Gemini Robotics](https://arxiv.org/abs/2503.20020)** | Un VLA Gemini-based integra comprensione multimodale, decomposizione e controllo; la variante Gemini Robotics-ER enfatizza reasoning spaziale, planning e progress estimation | Collega capacità web-scale a pianificazione e azione multi-embodiment |
-| **[$\pi_{0.5}$](https://arxiv.org/abs/2504.16054)** | Lo stesso modello viene co-addestrato a produrre azioni e target semantici di alto livello | Può alternare predizione di subtask e controllo low-level, favorendo generalizzazione open-world |
-| **[GR00T](https://research.nvidia.com/publication/2025-03_nvidia-isaac-gr00t-n1-open-foundation-model-humanoid-robots)** | Architettura dual-system: un VLM interpreta contesto e istruzione, mentre un action expert generativo produce traiettorie | Separa rappresentazione vision-language e generazione motoria per umanoidi e altri embodiment |
+| **Gemini Robotics** | Un VLA Gemini-based integra comprensione multimodale, decomposizione e controllo; la variante Gemini Robotics-ER enfatizza reasoning spaziale, planning e progress estimation | Collega capacità web-scale a pianificazione e azione multi-embodiment |
+| **$\pi_{0.5}$** | Lo stesso modello viene co-addestrato a produrre azioni e target semantici di alto livello | Può alternare predizione di subtask e controllo low-level, favorendo generalizzazione open-world |
+| **GR00T** | Architettura dual-system: un VLM interpreta contesto e istruzione, mentre un action expert generativo produce traiettorie | Separa rappresentazione vision-language e generazione motoria per umanoidi e altri embodiment |
 | **Reasoning-augmented VLA** | Il VLA riceve piani, chain of skills, affordance o subgoal generati esplicitamente | Migliora task lunghi se le rappresentazioni intermedie sono verificabili e grounded |
 | **World-model-assisted VLA** | Un world model predice conseguenze o video futuri e aiuta a scegliere piano o azione | Introduce look-ahead, ma efficacia e costo dipendono dalla fedeltà della dinamica appresa |
-
-Non ogni output testuale costituisce vero planning e non ogni action chunk implica reasoning. Una tassonomia utile deve quindi chiedere **dove avviene la deliberazione**, quale rappresentazione intermedia viene prodotta, come viene verificato il progresso e con quale frequenza il piano viene corretto attraverso nuove osservazioni.
-
 
 
 ## Dataset per VLA
@@ -428,7 +430,7 @@ Alcuni dati sono preziosi proprio perché restringono il problema. I dataset **A
 L'[approfondimento sui dataset per VLA](datasets/README.md#dataset-più-specifici) descrive queste sorgenti e il modo in cui possono integrare, senza sostituirle direttamente, le traiettorie robotiche.
 
 
-## Benchmark per VLA
+## Evaluation per VLA
 
 ### Benchmark simulati
 
@@ -437,3 +439,10 @@ I benchmark simulati rendono **ripetibili reset, perturbazioni e condizioni di s
 In breve **LIBERO** privilegia il trasferimento tra fattori semantici, **CALVIN** la persistenza su sequenze di skill, **SimplerEnv** la correlazione sim-to-real, **RoboCasa** la composizionalità domestica, **RLBench** l'ampiezza dei task e **ManiSkill** la manipolazione fisica scalabile.
 
 Dettagli specifici [qui](benchmark/README.md).
+
+
+### RobotEval (2025)
+
+
+### RoboPlayground (2026)
+
