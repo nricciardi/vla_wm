@@ -1,8 +1,8 @@
 # OpenVLA
 
-**OpenVLA** è un Vision-Language-Action model open-source da **7 miliardi** di parametri progettato per trasformare un VLM pre-addestrato in una policy robotica generalista. 
+**OpenVLA** è un Vision-Language-Action model open-source da **7 miliardi** di parametri progettato per trasformare un VLM pre-addestrato in una policy robotica generalista.
 
-Il modello riceve un'immagine dell'ambiente e un'istruzione linguistica $q$, quindi genera una sequenza di token che viene decodificata nell'azione continua $a_t$.
+Il modello riceve un'immagine dell'ambiente e un'istruzione linguistica $l$, quindi genera una sequenza di token che viene decodificata nell'azione continua $a_t$.
 
 Il contributo va letto rispetto a RT-2. Entrambi sfruttano la conoscenza semantica di un Vision-Language Model e rappresentano le azioni nello spazio dei token linguistici. OpenVLA rende però disponibili pesi, codice PyTorch, configurazioni di training e strumenti di fine-tuning, con l'obiettivo di offrire una base riproducibile per nuovi robot e dataset.
 
@@ -20,16 +20,16 @@ $$
 \text{Llama 2 7B}.
 $$
 
-L'encoder visivo trasforma l'immagine $o_t$ in patch embedding. 
+L'encoder visivo trasforma l'immagine $o_t$ in patch embedding.
 
-Il projector porta queste feature nella stessa dimensione degli embedding testuali di Llama, permettendo al language model di elaborare congiuntamente immagine e istruzione. 
+Il projector porta queste feature nella stessa dimensione degli embedding testuali di Llama, permettendo al language model di elaborare congiuntamente immagine e istruzione.
 
 Durante il robot pre-training, il target non è una risposta testuale ma la sequenza di token corrispondente all'azione dimostrata.
 
 La formulazione rimane:
 
 $$
-\pi_\theta(a_t\mid o_t,q),
+\pi_\theta(a_t\mid o_t,l),
 $$
 
 dove $\theta$ indica i parametri fine-tuned del VLA. La versione originaria usa una singola immagine per query e predice un solo step di controllo, che viene poi eseguito in closed loop acquisendo una nuova osservazione.
@@ -42,9 +42,9 @@ Prismatic combina due Vision Transformer pre-addestrati: **DINOv2** e **SigLIP**
 
 DINOv2, appreso con supervisione visuale self-supervised, fornisce feature utili per struttura, corrispondenze e geometria della scena. SigLIP è invece addestrato su coppie immagine-testo e privilegia l'allineamento semantico tra contenuto visuale e linguaggio.
 
-Le **feature dei due encoder vengono fuse prima del projector**. 
+Le **feature dei due encoder vengono fuse prima del projector**.
 
-L'intuizione è che il **controllo robotico richieda entrambe le proprietà**: **distinguere semanticamente l'oggetto** indicato da $q$ e **conservare dettagli spaziali** sufficienti per raggiungerlo e manipolarlo. Le ablation del lavoro mostrano che la scelta del visual backbone contribuisce in modo sostanziale alle prestazioni.
+L'intuizione è che il **controllo robotico richieda entrambe le proprietà**: **distinguere semanticamente l'oggetto** indicato da $l$ e **conservare dettagli spaziali** sufficienti per raggiungerlo e manipolarlo. Le ablation del lavoro mostrano che la scelta del visual backbone contribuisce in modo sostanziale alle prestazioni.
 
 Il visual encoder non determina comunque da solo l'azione. Le patch proiettate vengono elaborate dal backbone Llama insieme ai token linguistici, così che la rappresentazione finale dipenda dall'istruzione corrente.
 
@@ -85,7 +85,7 @@ $$
 =
 -\sum_{d=1}^{7}
 \log p_\theta\left(\tau(a_t^{(d)})
-\mid o_t,q,\tau(a_t^{(<d)})\right),
+\mid o_t,l,\tau(a_t^{(<d)})\right),
 $$
 
 dove $\tau(a_t^{(<d)})$ rappresenta i token delle componenti già generate. Il training del modello originale richiede 15 giorni su 64 GPU A100, un costo che chiarisce la differenza tra pre-training generalista e successivo adattamento a un singolo setup.
@@ -116,12 +116,12 @@ Aggiornare tutti i 7 miliardi di parametri richiede molta memoria. OpenVLA valut
 
 #### Limiti
 
-La rappresentazione per-dimension e per-timestep non modella esplicitamente la struttura temporale del movimento. 
+La rappresentazione per-dimension e per-timestep non modella esplicitamente la struttura temporale del movimento.
 
 **Quantizzazione e decoding autoregressivo limitano precisione e frequenza**, specialmente per controllo bimanuale o ad alta dimensionalità.
 
-Il modello richiede inoltre risorse considerevoli e usa un backbone Llama 2 soggetto alla relativa licenza. 
+Il modello richiede inoltre risorse considerevoli e usa un backbone Llama 2 soggetto alla relativa licenza.
 
-Il **fine-tuning solo robotico può erodere conoscenza web**, mentre il successo out-of-the-box è più solido sugli embodiment presenti in OXE che su robot completamente nuovi. 
+Il **fine-tuning solo robotico può erodere conoscenza web**, mentre il successo out-of-the-box è più solido sugli embodiment presenti in OXE che su robot completamente nuovi.
 
 Infine, le prestazioni dipendono dalle statistiche usate per normalizzare e de-tokenizzare le azioni, che devono essere coerenti con il setup target.

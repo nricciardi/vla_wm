@@ -10,12 +10,12 @@ $$\begin{gathered} \text{policy} \\ \big\downarrow \\ \text{riferimento} \\ \big
 
 ## Configurazione articolare e posa cartesiana
 
-Un robot manipolatore è composto da **giunti**, o *joint*, descritti dalla configurazione articolare $\boldsymbol{\theta}$ e collegati tra loro mediante segmenti rigidi chiamati *link*:
+Un robot manipolatore è composto da **giunti**, o *joint*, descritti dalla configurazione articolare $q$ e collegati tra loro mediante segmenti rigidi chiamati *link*:
 
 $$
-\boldsymbol{\theta}
+q
 =
-[\theta_1,\theta_2,\ldots,\theta_n]^\top.
+[q_1,q_2,\ldots,q_n]^\top.
 $$
 
 L'**end-effector** è il componente finale del braccio robotico, responsabile dell'interazione con l'ambiente. Può essere un gripper, una pinza, un utensile o qualsiasi altro dispositivo.
@@ -25,7 +25,7 @@ Solitamente l'end-effector è equipaggiato con un sensore, come una camera o un 
 La **cinematica diretta**, o *forward kinematics*, determina la posa dell'end-effector a partire dalla configurazione articolare:
 
 $$
-\mathbf{x}=f(\boldsymbol{\theta}).
+\mathbf{x}=f(q).
 $$
 
 La posa $\mathbf{x}$ comprende **posizione e orientazione**.
@@ -33,9 +33,9 @@ La posa $\mathbf{x}$ comprende **posizione e orientazione**.
 Nel **joint space**, target e traiettorie sono espressi direttamente mediante variabili articolari:
 
 $$
-\boldsymbol{\theta}_{\mathrm{des}},
+q_{\mathrm{des}},
 \qquad
-\dot{\boldsymbol{\theta}}_{\mathrm{des}},
+\dot q_{\mathrm{des}},
 \qquad
 \boldsymbol{\tau}_{\mathrm{des}}.
 $$
@@ -67,7 +67,7 @@ Prima dell'esecuzione, tuttavia, il target cartesiano deve essere convertito in 
 La **cinematica inversa**, o *inverse kinematics* (IK), cerca una configurazione articolare che realizzi una posa desiderata:
 
 $$
-f(\boldsymbol{\theta})=\mathbf{x}_{\mathrm{des}}.
+f(q)=\mathbf{x}_{\mathrm{des}}.
 $$
 
 Il problema può **non avere soluzione** se il target è fuori dal workspace, può avere **più soluzioni** se il robot è ridondante e può diventare numericamente difficile vicino alle **singolarità**.
@@ -75,24 +75,24 @@ Il problema può **non avere soluzione** se il target è fuori dal workspace, pu
 Per gestire queste possibilità, la cinematica inversa viene spesso formulata come un problema di ottimizzazione:
 
 $$
-\boldsymbol{\theta}^*
+q^*
 =
-\arg\min_{\boldsymbol{\theta}}
-\left\|\mathbf{e}_{\mathrm{pose}}\!\left(f(\boldsymbol{\theta}),\mathbf{x}_{\mathrm{des}}\right)\right\|_{\mathbf{W}}^2
+\arg\min_q
+\left\|\mathbf{e}_{\mathrm{pose}}\!\left(f(q),\mathbf{x}_{\mathrm{des}}\right)\right\|_{\mathbf{W}}^2
 +
-\lambda\,r(\boldsymbol{\theta}),
+\lambda\,r(q),
 $$
 
 soggetto ai limiti dei giunti e ad altri vincoli.
 
 Il vettore $\mathbf{e}_{\mathrm{pose}}$ misura separatamente **errore di posizione ed errore di orientazione**, evitando di trattare una rotazione come un comune vettore euclideo. La matrice $\mathbf{W}$ assegna invece un peso alle diverse componenti dell'errore.
 
-Il termine di regolarizzazione $r(\boldsymbol{\theta})$ può favorire configurazioni lontane dai limiti articolari, vicine alla configurazione corrente oppure prive di collisioni.
+Il termine di regolarizzazione $r(q)$ può favorire configurazioni lontane dai limiti articolari, vicine alla configurazione corrente oppure prive di collisioni.
 
 Per comandi di velocità, una soluzione locale può essere ottenuta mediante la pseudoinversa del Jacobiano:
 
 $$
-\dot{\boldsymbol{\theta}}
+\dot q
 =
 \mathbf{J}^{\dagger}\dot{\mathbf{x}}_{\mathrm{des}}.
 $$
@@ -177,11 +177,11 @@ Un target definisce dove arrivare, ma non necessariamente come raggiungerlo.
 La **generazione della traiettoria** costruisce una sequenza temporalmente parametrizzata di configurazioni, velocità e accelerazioni:
 
 $$
-\boldsymbol{\theta}_{\mathrm{des}}(t),
+q_{\mathrm{des}}(t),
 \qquad
-\dot{\boldsymbol{\theta}}_{\mathrm{des}}(t),
+\dot q_{\mathrm{des}}(t),
 \qquad
-\ddot{\boldsymbol{\theta}}_{\mathrm{des}}(t).
+\ddot q_{\mathrm{des}}(t).
 $$
 
 L'interpolazione deve rispettare i **limiti di velocità, accelerazione e jerk**. In assenza di questa fase, due target geometricamente validi possono generare un movimento brusco o fisicamente irrealizzabile.
@@ -232,10 +232,10 @@ $$
 \boldsymbol{\tau}
 =
 \mathbf{K}_P
-(\boldsymbol{\theta}_{\mathrm{des}}-\boldsymbol{\theta})
+(q_{\mathrm{des}}-q)
 +
 \mathbf{K}_D
-(\dot{\boldsymbol{\theta}}_{\mathrm{des}}-\dot{\boldsymbol{\theta}}).
+(\dot q_{\mathrm{des}}-\dot q).
 $$
 
 Controller più completi compensano **gravità, inerzia, attriti e accoppiamenti dinamici** tra i giunti.

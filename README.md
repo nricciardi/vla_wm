@@ -1,6 +1,6 @@
 # VLA e World Models
 
-I Vision-Language-Action model e i World Model affrontano due problemi **complementari ma distinti**. 
+I Vision-Language-Action model e i World Model affrontano due problemi **complementari ma distinti**.
 
 Un **VLA** riceve osservazioni visive, istruzioni linguistiche e, in alcuni casi, informazioni sullo stato del robot, per **produrre direttamente una o più azioni** eseguibili.
 
@@ -32,4 +32,18 @@ $$
 
 **I due approcci non sono alternativi**: un agente può utilizzare un World Model per simulare o valutare possibili evoluzioni future e un VLA, o una policy equivalente, per trasformare la decisione finale in azioni robotiche.
 
+## Background e prerequisiti
 
+Lo studio di VLA e World Model richiede alcuni strumenti comuni: apprendimento da dimostrazioni, controllo robotico e modelli generativi continui. La sezione dedicata ai [background](background/README.md) organizza questi prerequisiti e collega ogni concetto al ruolo che assume nei sistemi discussi nei capitoli principali.
+
+### Imitation Learning e Behavioral Cloning
+
+L'**Imitation Learning** apprende un comportamento da dimostrazioni prodotte da un esperto. Il **Behavioral Cloning** ne fornisce la formulazione supervisionata più diretta, ma introduce covariate shift, accumulo degli errori e difficoltà nel rappresentare azioni multimodali. Questi aspetti spiegano sia la raccolta dei dataset robotici sia molte scelte delle policy VLA. L'[approfondimento su Imitation Learning e Behavioral Cloning](background/imitation_learning/README.md) sviluppa formulazione probabilistica, loss, distribuzioni delle azioni e valutazione closed loop.
+
+### Controllo robotico
+
+Una policy produce normalmente riferimenti articolari o cartesiani, non segnali applicati direttamente ai motori. Cinematica inversa, generazione delle traiettorie e controller a frequenza più elevata trasformano tali riferimenti in movimento fisico. Comprendere questa gerarchia è necessario per interpretare action space, frequenze e vincoli di sicurezza dei VLA. L'[approfondimento sul controllo robotico](background/robot_control/README.md) tratta configurazioni articolari, pose, Jacobiano, controller e interfacce di comando.
+
+### Diffusion Models, score e Flow Matching
+
+Diffusion e Flow Matching modellano distribuzioni complesse attraverso processi dipendenti dal tempo. Nei sistemi generativi producono immagini o latent; nel robot learning possono rappresentare distribuzioni multimodali di azioni e action chunk continui. Il percorso sui [Diffusion Models e Flow Matching](background/diffusion/README.md) collega DDPM, latent diffusion, score-based SDE, Continuous Normalizing Flows e scelte di training e sampling.

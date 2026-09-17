@@ -10,9 +10,15 @@ L'Imitation Learning studia come apprendere un comportamento a partire da dimost
 
 ## Diffusion Models
 
-I diffusion model apprendono una distribuzione complessa trasformando progressivamente rumore in dati strutturati. In training il modello impara a invertire un processo di corruzione noto; in inference applica ripetutamente il denoising a partire da rumore casuale. Nel robot learning la stessa idea consente di rappresentare distribuzioni multimodali di traiettorie o action chunk, al costo di una generazione iterativa e quindi di maggiore latenza. L'[approfondimento sui Diffusion Models](diffusion/01_introduzione.md) parte dall'intuizione del processo forward e reverse e sviluppa successivamente i fondamenti matematici.
+I diffusion model apprendono una distribuzione complessa trasformando progressivamente rumore in dati strutturati. In training il modello impara un target locale lungo un processo di perturbazione noto; in inference un sampler usa ripetutamente tale previsione per generare un campione. Nel robot learning la stessa idea consente di rappresentare distribuzioni multimodali di traiettorie o action chunk, al costo di una procedura iterativa e quindi di maggiore latenza.
+
+L'[approfondimento sui Diffusion Models](diffusion/README.md) organizza il percorso dall'intuizione e dai fondamenti probabilistici fino a DDPM, latent diffusion, score-based SDE e aspetti implementativi.
 
 ## Flow Matching
+
+Il Flow Matching addestra direttamente il campo di velocità di una Continuous Normalizing Flow. Invece di ricavare la dinamica generativa da un processo di denoising, costruisce un probability path tra distribuzione base e dati e regredisce la velocità che lo genera. Il conditional flow matching rende il training simulation-free, mentre in inferenza il campo appreso viene integrato mediante un solver ODE.
+
+Il relativo [capitolo su Continuous Normalizing Flows e Flow Matching](diffusion/05_flow_matching/README.md) chiarisce la relazione con score, probability flow ODE, rectified flow e generazione di action chunk continui.
 
 ## Controllo Robotico
 

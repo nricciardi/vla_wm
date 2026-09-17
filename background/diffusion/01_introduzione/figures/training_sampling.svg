@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Confronto tra training e sampling di un diffusion model</title>
+  <desc id="desc">Nel training un dato pulito viene perturbato a un timestep casuale e il modello predice un target noto. Nel sampling il modello viene applicato iterativamente dal rumore fino al campione generato.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .panel { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; }
+      .box { fill: #ffffff; stroke: #475569; stroke-width: 2; rx: 12; }
+      .data { fill: #dbeafe; stroke: #2563eb; }
+      .noise { fill: #f3e8ff; stroke: #9333ea; }
+      .model { fill: #dcfce7; stroke: #16a34a; }
+      .title { font: 700 26px sans-serif; fill: #0f172a; }
+      .label { font: 600 18px sans-serif; fill: #0f172a; text-anchor: middle; }
+      .small { font: 15px sans-serif; fill: #475569; text-anchor: middle; }
+      .arrow { stroke: #334155; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="520" fill="#ffffff"/>
+
+  <rect class="panel" x="25" y="25" width="555" height="470" rx="20"/>
+  <rect class="panel" x="620" y="25" width="555" height="470" rx="20"/>
+  <text class="title" x="55" y="70">Training: un solo livello di rumore</text>
+  <text class="title" x="650" y="70">Sampling: integrazione iterativa</text>
+
+  <rect class="box data" x="65" y="125" width="150" height="80"/>
+  <text class="label" x="140" y="160">dato pulito</text>
+  <text class="small" x="140" y="185">x₀</text>
+
+  <path class="arrow" d="M215 165 L285 165"/>
+  <text class="small" x="250" y="140">t, ε</text>
+
+  <rect class="box noise" x="285" y="125" width="150" height="80"/>
+  <text class="label" x="360" y="160">dato rumoroso</text>
+  <text class="small" x="360" y="185">xₜ</text>
+
+  <path class="arrow" d="M360 205 L360 275"/>
+  <rect class="box model" x="270" y="275" width="180" height="85"/>
+  <text class="label" x="360" y="310">modello</text>
+  <text class="small" x="360" y="335">predizione locale</text>
+
+  <path class="arrow" d="M360 360 L360 420"/>
+  <rect class="box" x="265" y="420" width="190" height="50"/>
+  <text class="label" x="360" y="452">loss sul target noto</text>
+
+  <rect class="box noise" x="665" y="125" width="125" height="80"/>
+  <text class="label" x="727" y="160">rumore</text>
+  <text class="small" x="727" y="185">x_T</text>
+
+  <path class="arrow" d="M790 165 L840 165"/>
+  <rect class="box model" x="840" y="125" width="145" height="80"/>
+  <text class="label" x="912" y="160">modello</text>
+  <text class="small" x="912" y="185">+ sampler</text>
+
+  <path class="arrow" d="M985 165 L1035 165"/>
+  <rect class="box" x="1035" y="125" width="105" height="80"/>
+  <text class="label" x="1087" y="160">xₖ₋₁</text>
+  <text class="small" x="1087" y="185">meno rumore</text>
+
+  <path class="arrow" d="M1087 205 C1087 260 912 235 912 275"/>
+  <rect class="box model" x="840" y="275" width="145" height="80"/>
+  <text class="label" x="912" y="310">modello</text>
+  <text class="small" x="912" y="335">riutilizzato</text>
+
+  <path class="arrow" d="M912 355 L912 415"/>
+  <rect class="box data" x="830" y="415" width="165" height="55"/>
+  <text class="label" x="912" y="450">campione x₀</text>
+
+  <text class="small" x="140" y="285">I pesi vengono</text>
+  <text class="small" x="140" y="307">aggiornati</text>
+  <text class="small" x="1080" y="285">I pesi restano</text>
+  <text class="small" x="1080" y="307">congelati</text>
+</svg>

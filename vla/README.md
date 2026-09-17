@@ -11,10 +11,10 @@ $$
 in una policy condizionata anche da un'istruzione linguistica:
 
 $$
-\pi(a_t\mid o_t,q),
+\pi(a_t\mid o_t,l),
 $$
 
-dove $o_t$ rappresenta l'osservazione al tempo $t$, $q$ l'istruzione e $a_t$ l'azione prodotta dal modello.
+dove $o_t$ rappresenta l'osservazione al tempo $t$, $l$ l'istruzione e $a_t$ l'azione prodotta dal modello.
 
 ## Precursori
 
@@ -22,7 +22,7 @@ L'evoluzione dei VLA deriva dalla **convergenza di modelli multimodali, language
 
 ### Gato (2022)
 
-**Gato** mostra che task molto diversi possono essere ricondotti a un'**unica interfaccia** sequenziale: immagini, testo, propriocezione e azioni vengono convertiti in token ed elaborati dallo stesso Transformer autoregressivo. 
+**Gato** mostra che task molto diversi possono essere ricondotti a un'**unica interfaccia** sequenziale: immagini, testo, propriocezione e azioni vengono convertiti in token ed elaborati dallo stesso Transformer autoregressivo.
 
 Il modello è addestrato su **604 task** provenienti da controllo simulato, Atari, ambienti 3D, linguaggio e vision-language.
 
@@ -30,7 +30,7 @@ La componente robotica usa RGB-Stacking con dati sia simulati sia reali e osserv
 
 #### Novelty
 
-La novelty consiste nell'**unificazione di modalità**, embodiment e action space differenti all'interno di un solo sequence model. 
+La novelty consiste nell'**unificazione di modalità**, embodiment e action space differenti all'interno di un solo sequence model.
 
 #### Limiti
 
@@ -43,21 +43,21 @@ L'[approfondimento su Gato](models/gato/README.md) descrive composizione dei dat
 
 ### SayCan (2022)
 
-**SayCan** collega conoscenza linguistica e fattibilità fisica senza produrre direttamente low-level action. 
+**SayCan** collega conoscenza linguistica e fattibilità fisica senza produrre direttamente low-level action.
 
-Un LLM assegna una plausibilità $P_{LLM}$ alle skill compatibili con l'istruzione $q$ tramite log-likelihood.
+Un LLM assegna una plausibilità $P_{LLM}$ alle skill compatibili con l'istruzione $l$ tramite log-likelihood.
 
-Una value function $P_{value}$ ne stima invece l'**affordance**, cioè la fattibilità nello stato corrente; il prodotto dei due punteggi determina la skill da eseguire. 
+Una value function $P_{value}$ ne stima invece l'**affordance**, cioè la fattibilità nello stato corrente; il prodotto dei due punteggi determina la skill da eseguire.
 
 $$
-P_{LLM}(skill \mid q, history) \cdot P_{value}(skill\mid state) \longrightarrow \text{most feasible skill}
+P_{LLM}(skill \mid l, history) \cdot P_{value}(skill\mid state) \longrightarrow \text{most feasible skill}
 $$
 
 Le skill sono addestrate separatamente e vengono eseguite da un Everyday Robots mobile manipulator dotato di base mobile, braccio a 7 DoF, gripper e camera RGB. Il sistema è studiato in una mock kitchen e valutato anche in una seconda office kitchen, su 101 istruzioni reali.
 
 #### Novelty
 
-La novelty è l'uso della conoscenza di un LLM per comporre skill robotiche tenendo conto delle affordance apprese. 
+La novelty è l'uso della conoscenza di un LLM per comporre skill robotiche tenendo conto delle affordance apprese.
 
 #### Limiti
 
@@ -73,7 +73,7 @@ Prima che i VLA integrassero linguaggio, visione e controllo su larga scala, una
 
 ### IBC (2021)
 
-**Implicit Behavioral Cloning (IBC)** sostituisce la regressione diretta dell'azione con un **energy-based model**. 
+**Implicit Behavioral Cloning (IBC)** sostituisce la regressione diretta dell'azione con un **energy-based model**.
 
 Invece di produrre immediatamente $a_t$ da $o_t$, la rete assegna un'energia $E_\theta(o_t,a)$ alle azioni candidate e seleziona quella con energia minima:
 
@@ -81,11 +81,11 @@ $$
 \hat{a}_t = \arg\min_{a \in \mathcal{A}} E_\theta(o_t,a),
 $$
 
-dove $\mathcal{A}$ è lo spazio delle azioni ed $E_\theta$ è la funzione appresa con parametri $\theta$. 
+dove $\mathcal{A}$ è lo spazio delle azioni ed $E_\theta$ è la funzione appresa con parametri $\theta$.
 
 Questa formulazione può rappresentare meglio dimostrazioni multimodali o mapping discontinui, nei quali più azioni diverse risultano valide per la stessa osservazione.
 
-Gli esperimenti comprendono task D4RL con dimostrazioni umane, ambienti simulati di pushing e sweeping e quattro task reali eseguiti da un **xArm6** con **end-effector cilindrico**. 
+Gli esperimenti comprendono task D4RL con dimostrazioni umane, ambienti simulati di pushing e sweeping e quattro task reali eseguiti da un **xArm6** con **end-effector cilindrico**.
 
 Per i task reali vengono raccolte da 95 a 502 dimostrazioni teleoperate e la policy riceve soltanto immagini RGB prospettiche a 5 Hz.
 
@@ -97,7 +97,7 @@ La novelty consiste nel formulare il behavioral cloning come **regressione impli
 
 #### Limiti
 
-La scelta dell'azione richiede un processo di ottimizzazione o campionamento nello spazio $\mathcal{A}$. **Training e inferenza sono quindi più costosi** di una policy feed-forward esplicita e la difficoltà cresce con dimensionalità e vincoli dell'action space. 
+La scelta dell'azione richiede un processo di ottimizzazione o campionamento nello spazio $\mathcal{A}$. **Training e inferenza sono quindi più costosi** di una policy feed-forward esplicita e la difficoltà cresce con dimensionalità e vincoli dell'action space.
 
 Inoltre, IBC **non usa istruzioni linguistiche** e viene addestrato separatamente per i task considerati.
 
@@ -105,7 +105,7 @@ L'[approfondimento su IBC](models/ibc/README.md) sviluppa energy-based modeling,
 
 ### ACT (2023)
 
-**Action Chunking with Transformers (ACT)** è una policy di imitation learning introdotta insieme alla piattaforma bimanuale ALOHA. 
+**Action Chunking with Transformers (ACT)** è una policy di imitation learning introdotta insieme alla piattaforma bimanuale ALOHA.
 
 A partire dalle immagini di quattro camere e dalle posizioni articolari correnti, predice un **chunk di azioni future** invece della sola azione successiva:
 
@@ -115,7 +115,7 @@ $$
 
 dove $k$ è la lunghezza del chunk. Durante l'esecuzione, chunk sovrapposti forniscono più predizioni per lo stesso istante e un *temporal ensemble* le combina per ottenere movimenti più fluidi.
 
-ACT è valutato su due task simulati e sei task reali di manipolazione bimanuale fine. Le dimostrazioni sono raccolte con ALOHA, un sistema leader-follower formato da due bracci per l'operatore e due bracci follower a 7 DoF; l'action space della policy contiene quindi 14 target articolari. 
+ACT è valutato su due task simulati e sei task reali di manipolazione bimanuale fine. Le dimostrazioni sono raccolte con ALOHA, un sistema leader-follower formato da due bracci per l'operatore e due bracci follower a 7 DoF; l'action space della policy contiene quindi 14 target articolari.
 
 Il lavoro mostra che circa dieci minuti di dimostrazioni possono essere sufficienti per alcuni task contact-rich, come inserire una batteria o aprire un contenitore.
 
@@ -129,7 +129,7 @@ La novelty è la combinazione di **action chunking, Transformer, conditional VAE
 
 #### Limiti
 
-ACT viene **addestrato da zero e separatamente per ciascun task** del lavoro originario. Non riceve un'istruzione linguistica, **non trasferisce automaticamente skill tra task** e rimane legato alle osservazioni e all'action space articolare di ALOHA. 
+ACT viene **addestrato da zero e separatamente per ciascun task** del lavoro originario. Non riceve un'istruzione linguistica, **non trasferisce automaticamente skill tra task** e rimane legato alle osservazioni e all'action space articolare di ALOHA.
 
 Chunk molto lunghi riducono inoltre la reattività alle nuove osservazioni, mentre chunk brevi recuperano parte dei problemi del behavioral cloning step-by-step.
 
@@ -139,9 +139,9 @@ L'[approfondimento su ACT](models/act/README.md) descrive dataset, architettura 
 
 ### RT-1 (2022)
 
-**RT-1** sostituisce la composizione di skill separate con una singola policy che riceve una breve storia di immagini e un'istruzione $q$, quindi produce direttamente token di azione. 
+**RT-1** sostituisce la composizione di skill separate con una singola policy che riceve una breve storia di immagini e un'istruzione $l$, quindi produce direttamente token di azione.
 
-Il dataset principale contiene oltre 130.000 episodi reali raccolti in 17 mesi con 13 Everyday Robots mobile manipulators e copre più di 700 task in ambienti di tipo office kitchen. 
+Il dataset principale contiene oltre 130.000 episodi reali raccolti in 17 mesi con 13 Everyday Robots mobile manipulators e copre più di 700 task in ambienti di tipo office kitchen.
 
 La policy controlla braccio, gripper e base mobile mediante componenti continue discretizzate in 256 bin, oltre a un mode token che seleziona braccio, base o terminazione.
 
@@ -191,17 +191,17 @@ I **Vision-Language-Action model cross-embodiment** cercano di superare uno dei 
 
 L'obiettivo è invece costruire modelli che possano apprendere da esperienze raccolte con **embodiment differenti**, sfruttando regolarità condivise tra piattaforme diverse e trasferendo conoscenza da un robot all'altro.
 
-In questo contesto, il termine *embodiment* comprende non soltanto la morfologia del robot, ma anche il suo spazio delle azioni, la disposizione delle camere, i sensori disponibili e il tipo di controllo utilizzato. 
+In questo contesto, il termine *embodiment* comprende non soltanto la morfologia del robot, ma anche il suo spazio delle azioni, la disposizione delle camere, i sensori disponibili e il tipo di controllo utilizzato.
 
 Una policy cross-embodiment deve quindi affrontare un problema più difficile della normale generalizzazione tra task: deve **trovare una rappresentazione sufficientemente comune da permettere il trasferimento** tra diverse piattaforme, pur conservando le informazioni specifiche necessarie a controllare ciascuna piattaforma.
 
 Una formulazione generale considera una policy
 
 $$
-\pi(a_t \mid o_{\leq t}, q, e),
+\pi(a_t \mid o_{\leq t}, l, e),
 $$
 
-dove $o_{\leq t}$ rappresenta la storia delle osservazioni fino al tempo $t$, $q$ l'istruzione linguistica, $a_t$ l'azione e $e$ l'embodiment o, più in generale, l'insieme delle informazioni che determinano come l'azione debba essere interpretata dal robot. 
+dove $o_{\leq t}$ rappresenta la storia delle osservazioni fino al tempo $t$, $l$ l'istruzione linguistica, $a_t$ l'azione e $e$ l'embodiment o, più in generale, l'insieme delle informazioni che determinano come l'azione debba essere interpretata dal robot.
 
 I diversi lavori differiscono soprattutto nel modo in cui rendono confrontabili dati eterogenei, nel tipo di backbone utilizzato per collegare percezione e linguaggio e nella rappresentazione con cui vengono generate le azioni.
 
@@ -212,7 +212,7 @@ L'evoluzione della linea di ricerca può essere letta come un passaggio da **dat
 
 **RT-X** indica i modelli addestrati sul mixture cross-embodiment di Open X-Embodiment. Nel lavoro originale vengono studiati due casi: **RT-1-X**, ottenuto addestrando l'architettura RT-1 sui dati aggregati, e **RT-2-X**, che estende la stessa idea a RT-2, cioè a un Vision-Language-Action model derivato da un grande Vision-Language Model.
 
-RT-1-X serve soprattutto a verificare se il **co-training su robot differenti produca vantaggi** rispetto a policy addestrate esclusivamente sui dati di ciascuna piattaforma. 
+RT-1-X serve soprattutto a verificare se il **co-training su robot differenti produca vantaggi** rispetto a policy addestrate esclusivamente sui dati di ciascuna piattaforma.
 
 RT-2-X aggiunge una seconda sorgente di trasferimento: oltre alla diversità robotica, sfrutta la conoscenza visivo-semantica acquisita durante il pre-training su dati web. Le azioni vengono ricondotte a una rappresentazione comune dell'end-effector; nel caso di RT-2-X vengono rappresentate all'interno dello stesso paradigma token-based utilizzato dal modello vision-language.
 
@@ -237,7 +237,7 @@ L'architettura, la costruzione del mixture e il confronto tra RT-1-X e RT-2-X so
 
 ### Octo
 
-**Octo** passa da un semplice co-training cross-robot alla costruzione di una **generalist robot policy aperta e facilmente adattabile**. 
+**Octo** passa da un semplice co-training cross-robot alla costruzione di una **generalist robot policy aperta e facilmente adattabile**.
 
 Octo è una policy Transformer pre-addestrata su circa **800 mila traiettorie** provenienti da 25 dataset di Open X-Embodiment ed è progettata fin dall'inizio per **accettare combinazioni differenti di osservazioni**, task specification e spazi delle azioni.
 
@@ -265,11 +265,11 @@ La policy possiede inoltre una componente semantica meno ampia rispetto ai VLA c
 
 **OpenVLA** porta l'impostazione di RT-2 in un modello interamente aperto e progettato per il fine-tuning. Parte dal VLM *Prismatic-7B*, che combina encoder visuali **DINOv2 e SigLIP** con un backbone **Llama 2** da 7 miliardi di parametri, e lo addestra a generare **azioni robotiche come token discreti**.
 
-Il training utilizza circa **970.000 traiettorie *real-world*** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti. 
+Il training utilizza circa **970.000 traiettorie *real-world*** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti.
 
 Il modello viene valutato direttamente sui setup *WidowX* di BridgeData V2 e *Google Robot* della famiglia RT; viene inoltre adattato a due setup Franka, Franka-Tabletop a 5 Hz e Franka-DROID a 15 Hz.
 
-Ogni componente continua dell'azione viene **normalizzata, discretizzata in 256 bin** e associata a uno dei token meno usati del vocabolario Llama. 
+Ogni componente continua dell'azione viene **normalizzata, discretizzata in 256 bin** e associata a uno dei token meno usati del vocabolario Llama.
 
 Il language model può così apprendere con lo stesso **obiettivo autoregressivo** la sequenza che rappresenta:
 
@@ -284,11 +284,11 @@ dove le prime sei componenti descrivono la variazione di posa dell'end-effector 
 
 #### Novelty
 
-OpenVLA offre una delle prime implementazioni **open-source e riproducibili di un VLA da 7B parametri**, includendo checkpoint, pipeline PyTorch, training su mixture RLDS e supporto al fine-tuning. 
+OpenVLA offre una delle prime implementazioni **open-source e riproducibili di un VLA da 7B parametri**, includendo checkpoint, pipeline PyTorch, training su mixture RLDS e supporto al fine-tuning.
 
 La **fusione di DINOv2 e SigLIP** combina feature sensibili alla struttura spaziale con rappresentazioni allineate semanticamente al linguaggio.
 
-Il modello mostra inoltre che una **policy molto più piccola di RT-2-X può beneficiare congiuntamente del pre-training web del VLM e del pre-training su un grande corpus robotico**. 
+Il modello mostra inoltre che una **policy molto più piccola di RT-2-X può beneficiare congiuntamente del pre-training web del VLM e del pre-training su un grande corpus robotico**.
 
 Tramite LoRA è possibile adattare soltanto una piccola frazione dei parametri mantenendo, nel protocollo studiato, prestazioni vicine al full fine-tuning.
 
@@ -302,8 +302,40 @@ L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prism
 
 ## Flow Matching VLA
 
-### Pi-0
+### $\pi_0$ (2024)
 
+**$\pi_0$** è un Vision-Language-Action model da **3.3 miliardi** di parametri che combina il VLM **PaliGemma** con un **action expert** dedicato alla generazione continua di movimenti.
+
+Il modello riceve **due o tre immagini**, l'**istruzione linguistica** $l$ e lo **stato propriocettivo** $q_t$, quindi produce mediante **flow matching un chunk di 50 azioni future**.
+Questa soluzione evita la quantizzazione di RT-2 e OpenVLA e consente controllo destro fino a 50 Hz.
+
+Il pre-training combina un subset di Open X-Embodiment con oltre **10.000 ore di dati proprietari**, pari a 903 milioni di timestep, raccolti su sette configurazioni robotiche e 68 task complessi. Gli embodiment comprendono UR5e e Franka a singolo braccio, setup bimanuali UR5e, Trossen e ARX/AgileX, e manipolatori mobili bimanuali. Il modello usa vettori di stato e azione zero-padded fino alla dimensionalità massima, preservando una singola architettura tra piattaforme differenti.
+
+
+La ricetta separa **pre-training generalista** e **post-training task-specifico**.
+
+- **Pre-training generalista**: amplia capacità e recovery attraverso dati eterogenei
+- **Post-training task-specifico**: insegna strategie fluide per task lunghi e precisi.
+
+
+Le valutazioni includono folding di indumenti, riordino del tavolo, grocery bagging, assemblaggio di scatole e mobile manipulation, con episodi che possono durare da cinque a venti minuti.
+
+
+![Architettura di pi zero](models/pi0/figures/pi0_architecture.webp)
+
+#### Novelty
+
+$\pi_0$ introduce una delle prime integrazioni su larga scala tra **VLM pre-addestrato, action expert continuo, flow matching e action chunking ad alta frequenza**. Mostra inoltre che il pre-training cross-embodiment può costituire una base comune per skill destre e bimanuali molto più complesse del normale pick-and-place.
+
+#### Limiti
+
+Gran parte dei **dati robotici e la pipeline completa di training non sono pubblici**, rendendo difficile replicare il risultato.
+
+La composizione ottimale del mixture rimane poco compresa, le **prestazioni non sono uniformi tra task** e il trasferimento a domini lontani dalla manipolazione non viene dimostrato.
+
+I task più complessi richiedono ancora post-training consistente e, in alcuni casi, una policy VLM di alto livello che scomponga il goal in istruzioni intermedie.
+
+L'[approfondimento su $\pi_0$](models/pi0/README.md) sviluppa architettura, flow matching, mixture dei dati, normalizzazione cross-embodiment, training ed esperimenti real-world.
 
 
 
@@ -314,7 +346,31 @@ L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prism
 
 ### Pi 0.5
 
-### GR00T
+### GR00T N1 (2025)
+
+**GR00T N1** è un foundation model aperto per manipolazione generalista, progettato con particolare attenzione ai **robot umanoidi**.
+
+La variante pubblicata **GR00T-N1-2B** contiene 2.2 miliardi di parametri e segue un'architettura **dual-system**: il VLM Eagle-2 interpreta immagini e istruzione $l$, mentre un Diffusion Transformer condizionato sulle feature vision-language genera chunk di 16 azioni continue tramite flow matching.
+
+Encoder di stato e decoder delle azioni specifici per embodiment portano **spazi cinematici differenti in una rappresentazione condivisa**.
+
+Il training usa una **data pyramid** composta da traiettorie robotiche reali, simulazione, video umani egocentrici e *neural trajectories* generate da modelli video. Per i video privi di comandi vengono apprese **latent action** oppure stimate pseudo-azioni mediante inverse dynamics.
+
+Il modello viene valutato su 24 task RoboCasa, 9 task DexMimicGen cross-embodiment, 24 task GR-1 simulati e attività reali eseguite dal robot umanoide **Fourier GR-1**.
+
+![Architettura dual-system di GR00T N1](models/groot/figures/groot_overview.webp)
+
+#### Novelty
+
+GR00T N1 integra in una release pubblica **VLM, policy flow-matching, adattatori cross-embodiment e supervisione proveniente da video senza azioni**. La combinazione di latent action, inverse dynamics, DexMimicGen e generazione video cerca di trasformare fonti eterogenee in supervisione utilizzabile da un'unica policy.
+
+#### Limiti
+
+Il lavoro si concentra soprattutto su manipolazione tabletop short-horizon: locomozione e **loco-manipulation umanoide di lunga durata rimangono fuori** dal perimetro sperimentale.
+
+Le neural trajectories possono violare fisica o istruzioni e richiedono filtri e pseudo-label rumorose; inoltre il pre-training principale richiede circa 50,000 ore GPU H100, un **costo molto elevato** nonostante il checkpoint e parte dell'ecosistema siano aperti.
+
+L'[approfondimento su GR00T N1](models/groot/README.md) analizza i due sistemi, il flow matching, la data pyramid, i meccanismi di pseudo-labeling, i benchmark e l'adattamento al GR-1.
 
 
 ## Real-time VLA
@@ -351,9 +407,9 @@ La seconda distinzione riguarda **quanta dinamica futura viene rappresentata in 
 
 | Schema temporale | Forma concettuale | Esempi e ruolo |
 | --- | --- | --- |
-| **Single-step action prediction** | $\pi(a_t\mid o_t,q)$ | RT-1, RT-2 e OpenVLA originario producono l'azione del passo corrente |
-| **History window** | $\pi(a_t\mid o_{t-h:t},q)$ | Una breve sequenza di osservazioni disambigua velocità, contatti e fase del task; RT-1 e Octo ne sono esempi |
-| **Trajectory prediction** | $\pi(a_{t:t+H}\mid o_{\leq t},q)$ | Il modello rappresenta esplicitamente l'evoluzione futura locale, anziché azioni indipendenti |
+| **Single-step action prediction** | $\pi(a_t\mid o_t,l)$ | RT-1, RT-2 e OpenVLA originario producono l'azione del passo corrente |
+| **History window** | $\pi(a_t\mid o_{t-h:t},l)$ | Una breve sequenza di osservazioni disambigua velocità, contatti e fase del task; RT-1 e Octo ne sono esempi |
+| **Trajectory prediction** | $\pi(a_{t:t+H}\mid o_{\leq t},l)$ | Il modello rappresenta esplicitamente l'evoluzione futura locale, anziché azioni indipendenti |
 | **Action chunks** | Un blocco di $H$ comandi viene generato congiuntamente | ACT, Octo, $\pi_0$ e GR00T riducono l'orizzonte decisionale effettivo e migliorano la coerenza del moto |
 | **Receding-horizon control** | Si genera un chunk, se ne esegue soltanto un prefisso e si pianifica di nuovo | Recupera reattività rispetto all'esecuzione open loop dell'intero chunk |
 | **Closed-loop replanning** | Nuove osservazioni aggiornano continuamente la decisione | È il principio generale che accomuna policy single-step e chunked quando vengono rieseguite durante il task |
@@ -375,10 +431,10 @@ RT-2, OpenVLA e Gemini Robotics illustrano la trasformazione diretta di una base
 
 ### Reasoning e planning nei VLA
 
-Il termine **reasoning** può indicare capacità molto diverse. È utile separare il ragionamento semantico necessario a interpretare $q$ dalla pianificazione temporale e dalla generazione dei comandi motori.
+Il termine **reasoning** può indicare capacità molto diverse. È utile separare il ragionamento semantico necessario a interpretare $l$ dalla pianificazione temporale e dalla generazione dei comandi motori.
 
 $$
-q,o_{\leq t}
+l,o_{\leq t}
 \rightarrow
 \text{high-level reasoning}
 \rightarrow
@@ -390,7 +446,7 @@ $$
 - **Task decomposition** trasforma un obiettivo lungo in una catena di skill
 - **Subgoal prediction** produce uno stato intermedio, una frase o una rappresentazione latente
 - **Language planning** costruisce una sequenza simbolica
-- **Controller low-level** traduce infine il passo corrente in azioni. 
+- **Controller low-level** traduce infine il passo corrente in azioni.
 
 Ragionare prima dell'action decoding rende più leggibile la separazione tra *"che cosa fare"* e *"come muoversi"*, ma introduce latenza e nuovi punti di errore.
 
@@ -410,7 +466,7 @@ Tuttavia non ogni output testuale costituisce vero planning e non ogni action ch
 
 I dataset determinano quali oggetti, ambienti, skill ed embodiment una policy può osservare durante il training.
 
-Una traiettoria robotica associa tipicamente una sequenza di osservazioni $o_t$, un'istruzione linguistica $q$ e le azioni $a_t$ eseguite dal robot.
+Una traiettoria robotica associa tipicamente una sequenza di osservazioni $o_t$, un'istruzione linguistica $l$ e le azioni $a_t$ eseguite dal robot.
 
 La quantità di dati è importante, ma non sostituisce la varietà delle situazioni né la qualità delle dimostrazioni.
 
@@ -449,4 +505,3 @@ I benchmark simulati rendono **ripetibili reset, perturbazioni e condizioni di s
 In breve **LIBERO** privilegia il trasferimento tra fattori semantici, **CALVIN** la persistenza su sequenze di skill, **SimplerEnv** la correlazione sim-to-real, **RoboCasa** la composizionalità domestica, **RLBench** l'ampiezza dei task e **ManiSkill** la manipolazione fisica scalabile.
 
 Dettagli specifici [qui](evaluation/README.md).
-

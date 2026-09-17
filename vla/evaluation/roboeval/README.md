@@ -34,7 +34,7 @@ $$
 \left\{(s_0,a_0,\ldots,s_T)^{(i)}\right\}_{i=1}^{N},
 $$
 
-dove $N$ è il numero di dimostrazioni e $T$ può variare tra episodi. Ogni task base genera inoltre una famiglia $\mathcal{T}_{\boldsymbol{\eta}}$, nella quale il vettore $\boldsymbol{\eta}\in\mathcal{H}$ controlla perturbazioni come posizione e orientamento degli oggetti. La notazione $\boldsymbol{\eta}$ distingue il parametro della variante sia dall'istruzione linguistica $q$ sia dalla configurazione articolare, indicata nel seguito con $\boldsymbol{\theta}_t$.
+dove $N$ è il numero di dimostrazioni e $T$ può variare tra episodi. Ogni task base genera inoltre una famiglia $\mathcal{T}_{\boldsymbol{\eta}}$, nella quale il vettore $\boldsymbol{\eta}\in\mathcal{H}$ controlla perturbazioni come posizione e orientamento degli oggetti. La notazione $\boldsymbol{\eta}$ distingue il parametro della variante sia dall'istruzione linguistica $l$ sia dalla configurazione articolare, indicata nel seguito con $q_t$.
 
 ## Task, variazioni ed embodiment
 
@@ -80,13 +80,13 @@ RoboEval distingue **metriche comportamentali** e **metriche di outcome**. Le pr
 
 ### Efficienza temporale e spaziale
 
-L'efficienza temporale viene misurata mediante numero di step e tempo di completamento. Quella spaziale usa la lunghezza cumulativa del percorso nello spazio articolare, cartesiano e delle orientazioni. Indicando con $\boldsymbol{\theta}_t$ la configurazione articolare e con $x_t\in\mathbb{R}^3$ la posizione cartesiana dell'end-effector al tempo $t$, le prime due grandezze sono
+L'efficienza temporale viene misurata mediante numero di step e tempo di completamento. Quella spaziale usa la lunghezza cumulativa del percorso nello spazio articolare, cartesiano e delle orientazioni. Indicando con $q_t$ la configurazione articolare e con $x_t\in\mathbb{R}^3$ la posizione cartesiana dell'end-effector al tempo $t$, le prime due grandezze sono
 
 $$
 L_{\mathrm{joint}}
 =
 \sum_{t=1}^{T-1}
-\left\|\boldsymbol{\theta}_{t+1}-\boldsymbol{\theta}_t\right\|_2,
+\left\|q_{t+1}-q_t\right\|_2,
 $$
 
 $$
@@ -112,7 +112,7 @@ J_{\mathrm{cart}}
 \right\|_2,
 $$
 
-dove $\Delta t$ è l'intervallo di controllo. La stessa costruzione applicata a $\boldsymbol{\theta}_t$ produce $J_{\mathrm{joint}}$. Valori bassi indicano un segnale meno brusco, ma possono dipendere anche da smoothing, action chunking o frequenza del controller; non costituiscono da soli una prova di destrezza.
+dove $\Delta t$ è l'intervallo di controllo. La stessa costruzione applicata a $q_t$ produce $J_{\mathrm{joint}}$. Valori bassi indicano un segnale meno brusco, ma possono dipendere anche da smoothing, action chunking o frequenza del controller; non costituiscono da soli una prova di destrezza.
 
 Alle misure cinematiche si aggiungono tre conteggi di contatto: **self-collision** tra link del robot, collisioni con l'ambiente e **slip**, cioè perdita involontaria del contatto tra gripper e oggetto afferrato. Questi segnali distinguono, per esempio, una soluzione efficace ma aggressiva da una soluzione altrettanto efficace e stabile.
 

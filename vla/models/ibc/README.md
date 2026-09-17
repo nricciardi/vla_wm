@@ -1,6 +1,6 @@
 # Implicit Behavioral Cloning
 
-**Implicit Behavioral Cloning (IBC)** è un metodo di imitation learning che rappresenta una policy mediante un **energy-based model (EBM)**. 
+**Implicit Behavioral Cloning (IBC)** è un metodo di imitation learning che rappresenta una policy mediante un **energy-based model (EBM)**.
 
 Il lavoro non introduce un VLA completo: **manca un task conditioning linguistico** generalista e ogni policy è addestrata per lo specifico dominio sperimentale. Il suo interesse per i VLA risiede nel modo in cui trasforma la predizione delle azioni da regressione esplicita a problema di compatibilità tra osservazioni e azioni.
 

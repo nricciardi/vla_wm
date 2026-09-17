@@ -7,10 +7,10 @@ A differenza di SayCan, il modello non seleziona una skill predefinita che viene
 La formulazione generale è:
 
 $$
-\pi(a_t \mid o_{t-k:t}, q)
+\pi(a_t \mid o_{t-k:t}, l)
 $$
 
-dove $o_{t-k:t}$ rappresenta una breve sequenza temporale di immagini, $q$ l’istruzione linguistica e $a_t$ l’azione robotica corrente.
+dove $o_{t-k:t}$ rappresenta una breve sequenza temporale di immagini, $l$ l’istruzione linguistica e $a_t$ l’azione robotica corrente.
 
 
 ## Dataset
@@ -83,13 +83,13 @@ $$
 FiLM genera, a partire dall’embedding dell’istruzione, due vettori:
 
 $$
-\gamma(q),\beta(q)\in\mathbb{R}^{C}
+\gamma(l),\beta(l)\in\mathbb{R}^{C}
 $$
 
 e applica una trasformazione affine indipendente a ciascun canale:
 
 $$
-\text{FiLM}(x)=\gamma(q)\odot x+\beta(q)
+\text{FiLM}(x)=\gamma(l)\odot x+\beta(l)
 $$
 
 Questo significa che il language conditioning viene applicato direttamente alle rappresentazioni visive. Ad esempio, di fronte alla stessa immagine della cucina, le feature considerate rilevanti possono cambiare tra: *pick the apple* e *open the drawer*.
@@ -248,7 +248,7 @@ Dato un dataset di dimostrazioni:
 $$
 D=
 \{
-(o_t,q,a_t)
+(o_t,l,a_t)
 \}_{t=1}^{N}
 $$
 
@@ -261,7 +261,7 @@ $$
 =
 -\sum_i
 \log
-P(a_i^{*}\mid o,q)
+P(a_i^{*}\mid o,l)
 $$
 
 dove $a_i^{*}$ rappresenta il token corretto per una determinata componente dell’azione.

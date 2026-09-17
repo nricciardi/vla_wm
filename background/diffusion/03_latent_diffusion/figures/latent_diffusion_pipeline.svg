@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390" role="img" aria-labelledby="title desc">
+  <title id="title">Pipeline di un Latent Diffusion Model</title>
+  <desc id="desc">Un encoder comprime l'immagine in un latent. Il processo generativo opera nello spazio latente, condizionato dal testo, e un decoder ricostruisce l'immagine.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .box { fill: #fff; stroke: #475569; stroke-width: 2; rx: 14; }
+      .image { fill: #dbeafe; stroke: #2563eb; }
+      .latent { fill: #f3e8ff; stroke: #9333ea; }
+      .process { fill: #dcfce7; stroke: #16a34a; }
+      .text { fill: #fef3c7; stroke: #d97706; }
+      .title { font: 700 27px sans-serif; fill: #0f172a; }
+      .label { font: 600 18px sans-serif; fill: #0f172a; text-anchor: middle; }
+      .small { font: 15px sans-serif; fill: #475569; text-anchor: middle; }
+      .arrow { stroke: #334155; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 8 7; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="390" fill="#ffffff"/>
+
+  <text class="title" x="35" y="48">Compressione percettiva e generazione nello spazio latente</text>
+
+  <rect class="box image" x="35" y="125" width="150" height="95"/>
+  <text class="label" x="110" y="165">immagine</text>
+  <text class="small" x="110" y="193">x₀ ∈ ℝᴴˣᵂˣ³</text>
+
+  <path class="arrow" d="M185 172 L250 172"/>
+  <rect class="box" x="250" y="125" width="145" height="95"/>
+  <text class="label" x="322" y="165">encoder</text>
+  <text class="small" x="322" y="193">E(x₀)</text>
+
+  <path class="arrow" d="M395 172 L460 172"/>
+  <rect class="box latent" x="460" y="125" width="155" height="95"/>
+  <text class="label" x="537" y="165">latent</text>
+  <text class="small" x="537" y="193">z₀, griglia ridotta</text>
+
+  <path class="arrow" d="M615 172 L680 172"/>
+  <rect class="box process" x="680" y="105" width="220" height="135"/>
+  <text class="label" x="790" y="150">processo generativo</text>
+  <text class="small" x="790" y="180">z_T → … → z₀</text>
+  <text class="small" x="790" y="207">U-Net, DiT o flow</text>
+
+  <path class="arrow" d="M900 172 L965 172"/>
+  <rect class="box" x="965" y="125" width="105" height="95"/>
+  <text class="label" x="1017" y="165">decoder</text>
+  <text class="small" x="1017" y="193">D(z₀)</text>
+
+  <path class="arrow" d="M1070 172 L1125 172"/>
+  <rect class="box image" x="1125" y="125" width="55" height="95"/>
+  <text class="label" x="1152" y="179">x̂₀</text>
+
+  <rect class="box text" x="675" y="295" width="230" height="65"/>
+  <text class="label" x="790" y="323">condizione</text>
+  <text class="small" x="790" y="346">testo, layout, immagini</text>
+  <path class="arrow dash" d="M905 327 C955 290 935 245 900 220"/>
+
+  <text class="small" x="322" y="270">addestrato per ricostruire</text>
+  <text class="small" x="790" y="270">addestrato sulla distribuzione dei latent</text>
+</svg>

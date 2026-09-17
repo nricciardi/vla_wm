@@ -19,10 +19,10 @@ Quest'ultimo punto è essenziale. Un LLM capace di generare arbitrariamente scen
 Un task viene formalizzato come
 
 $$
-\mathcal{T}=(\mathcal{A},\rho_0,G,\ell,\mathcal{V}),
+\mathcal{T}=(\mathcal{A},\rho_0,G,l_{\mathrm{ref}},\mathcal{V}),
 $$
 
-dove $\mathcal{A}$ è l'insieme degli asset, $\rho_0$ la distribuzione degli stati iniziali, $G:\mathcal{S}\rightarrow\{0,1\}$ il predicato di successo sullo stato del simulatore $s\in\mathcal{S}$, $\ell$ l'istruzione canonica e $\mathcal{V}$ un insieme di parafrasi per testare la robustezza linguistica. L'istruzione fornita alla policy è indicata con $q$; $\ell$ rappresenta invece la formulazione canonica conservata nell'artefatto e non una nuova variabile di controllo robotico.
+dove $\mathcal{A}$ è l'insieme degli asset, $\rho_0$ la distribuzione degli stati iniziali, $G:\mathcal{S}\rightarrow\{0,1\}$ il predicato di successo sullo stato del simulatore $s\in\mathcal{S}$, $l_{\mathrm{ref}}$ l'istruzione canonica e $\mathcal{V}$ un insieme di parafrasi per testare la robustezza linguistica. L'istruzione effettivamente fornita alla policy è indicata con $l\in\{l_{\mathrm{ref}}\}\cup\mathcal{V}$; il pedice distingue soltanto la formulazione di riferimento conservata nell'artefatto.
 
 La separazione tra questi componenti risolve un'ambiguità importante. Due frasi semanticamente equivalenti possono produrre valutazioni diverse se cambiano tolleranze, distribuzione di reset o istante in cui si controlla il successo. **Il testo non è quindi, da solo, un'unità sperimentale sufficiente**: l'artefatto deve rendere esplicite anche inizializzazione, asset e logica di verifica.
 

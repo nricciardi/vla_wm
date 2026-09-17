@@ -38,10 +38,10 @@ h_t = (o_0,a_0,o_1,a_1,\ldots,o_t),
 \pi(a_t \mid h_t).
 $$
 
-Nella robotica language-conditioned, l'istruzione $q$ entra a sua volta nel contesto della policy:
+Nella robotica language-conditioned, l'istruzione $l$ entra a sua volta nel contesto della policy:
 
 $$
-\pi(a_t \mid h_t,q).
+\pi(a_t \mid h_t,l).
 $$
 
 Questa distinzione è importante: scrivere $\pi(a_t\mid o_t)$ non implica che ogni problema sia realmente risolvibile a partire da un singolo frame. È soltanto una scelta di modellazione, spesso adottata per semplificare la notazione.
@@ -75,7 +75,7 @@ Il dataset può inoltre contenere istruzioni linguistiche, stato propriocezional
 
 $$
 \tau^{(i)} =
-(q^{(i)},o_0^{(i)},a_0^{(i)},\ldots,o_{T_i}^{(i)},a_{T_i}^{(i)}).
+(l^{(i)},o_0^{(i)},a_0^{(i)},\ldots,o_{T_i}^{(i)},a_{T_i}^{(i)}).
 $$
 
 Il Behavioral Cloning utilizza necessariamente osservazioni e azioni; le altre informazioni diventano utili soltanto se entrano nel condizionamento della policy, nella loss oppure nella selezione dei dati.
@@ -120,9 +120,9 @@ Con istruzioni linguistiche e memoria, il condizionamento può essere esteso sen
 $$
 \mathcal{L}_{\mathrm{BC}}(\theta)
 =
--\mathbb{E}_{(h,q,a)\sim\mathcal{D}_E}
+-\mathbb{E}_{(h,l,a)\sim\mathcal{D}_E}
 \left[
-\log \pi_\theta(a\mid h,q)
+\log \pi_\theta(a\mid h,l)
 \right].
 $$
 

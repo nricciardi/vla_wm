@@ -20,6 +20,7 @@ Questa directory contiene una raccolta strutturata di appunti e conoscenze su Vi
 - Organizzare gli argomenti in file e sottodirectory coerenti. Ogni capitolo importante o corposo deve avere una sottodirectory dedicata con il testo completo; questo vale anche per l'analisi di un singolo paper e per prerequisiti estesi come il controllo robotico. Una sezione realmente breve può rimanere nel README che la introduce.
 - Usare i README di livello superiore come introduzioni e indici ragionati. Il testo completo non deve essere duplicato nel README principale.
 - Per ogni approfondimento, mantenere nel README principale un summary autosufficiente che permetta di comprenderne il ruolo senza aprire immediatamente il file dedicato.
+- Negli approfondimenti dedicati a un paper, includere le immagini del paper rilevanti per comprendere architettura, pipeline, task o risultati. Selezionare soltanto figure realmente informative, salvarle nella sottodirectory dell'approfondimento, mantenerle leggibili nel Markdown e accompagnarle con una breve didascalia che ne chiarisca il contenuto e indichi esplicitamente paper e numero della figura come fonte.
 - Il summary di un paper deve chiarire, in forma discorsiva e concisa, l'intuizione centrale, i dataset utilizzati, il robot o gli embodiment coinvolti, la novelty e le limitazioni. Se una voce non è applicabile, come il robot per un argomento teorico, non introdurre campi artificiali o informazioni prive di significato.
 - Per ogni modello, presentare di norma novelty e limiti in due sottosezioni distinte di quarto livello, intitolate `#### Novelty` e `#### Limiti`. Sviluppare ciascuna sottosezione in uno o più paragrafi autonomi, senza accorpare novelty e limiti nello stesso paragrafo.
 - Concludere il summary con un collegamento naturale all'approfondimento nella relativa sottodirectory.
@@ -30,9 +31,10 @@ Questa directory contiene una raccolta strutturata di appunti e conoscenze su Vi
 
 ## Notazione
 
+- Usare la notazione numerica anglofona: il punto `.` come separatore decimale e la virgola `,` come separatore delle migliaia. Per esempio, scrivere `3.5`, `10,000` e `10,000.5`, evitando le forme italiane `3,5` e `10.000`.
 - Delimitare sempre il LaTeX inline con `$...$` e quello su riga separata con `$$...$$`; non usare `\(...\)` o `\[...\]`.
 - Usare $o_t$ per l'osservazione, $a_t$ per l'azione e $s_t$ per lo stato, salvo esigenze motivate e dichiarate nel testo.
-- Usare sempre $q$ per rappresentare l'istruzione linguistica, incluse le sezioni dedicate a RT-1 e RT-2.
-- Non sostituire con $q$ gli indici matematici privi di significato linguistico, come l'indice di un esempio o di una componente dell'azione.
-- Se la configurazione articolare compare nello stesso contesto dell'istruzione linguistica, usare $\boldsymbol{\theta}$ per i giunti in modo da evitare ambiguità con $q$.
+- Usare sempre $l$ per rappresentare l'istruzione linguistica, incluse le sezioni dedicate a RT-1 e RT-2.
+- Usare $q_t$ per lo stato del robot e $q$ per la configurazione articolare, con $\dot q$ e $\ddot q$ per velocità e accelerazione articolare. Quando è utile evidenziarne la natura vettoriale, usare $\mathbf{q}_t$ mantenendo invariato il simbolo di base.
+- Non sostituire con $l$ o $q$ indici e funzioni che hanno un significato matematico differente. In particolare, $q(\cdot)$ può continuare a indicare una distribuzione forward o variazionale e una funzione di quantizzazione se il significato viene dichiarato esplicitamente.
 - Mantenere la notazione coerente tra formule, testo e figure lungo tutto il capitolo.

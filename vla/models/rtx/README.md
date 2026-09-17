@@ -85,10 +85,10 @@ Ogni dataset può contenere più camere, risoluzioni differenti e segnali sensor
 La formulazione generale rimane quella di una policy language-conditioned:
 
 $$
-\pi(a_t \mid o_{\leq t}, q)
+\pi(a_t \mid o_{\leq t}, l)
 $$
 
-dove $o_{\leq t}$ rappresenta l'osservazione visiva corrente o una breve history temporale, $q$ è l'istruzione linguistica e $a_t$ è l'azione robotica.
+dove $o_{\leq t}$ rappresenta l'osservazione visiva corrente o una breve history temporale, $l$ è l'istruzione linguistica e $a_t$ è l'azione robotica.
 
 Non tutti i dataset possiedono però istruzioni linguistiche annotate nello stesso modo. La costruzione del corpus richiede quindi una standardizzazione anche del task description, così che il testo possa essere utilizzato come interfaccia comune tra task provenienti da sorgenti differenti.
 

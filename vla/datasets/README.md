@@ -2,13 +2,13 @@
 
 ## Dataset real-world generalisti
 
-I dataset real-world raccolgono l'interazione effettiva tra robot e ambiente. Rispetto alla simulazione conservano fenomeni difficili da modellare, come attrito, deformazioni, occlusioni ed errori di calibrazione, ma sono più costosi da acquisire e spesso riflettono le scelte hardware di un singolo laboratorio. 
+I dataset real-world raccolgono l'interazione effettiva tra robot e ambiente. Rispetto alla simulazione conservano fenomeni difficili da modellare, come attrito, deformazioni, occlusioni ed errori di calibrazione, ma sono più costosi da acquisire e spesso riflettono le scelte hardware di un singolo laboratorio.
 
 La loro generalità va quindi valutata lungo almeno tre assi: **diversità dei task**, **diversità degli ambienti** e **diversità degli embodiment**.
 
 ### Open X-Embodiment
 
-**Open X-Embodiment (OXE)** è un'iniziativa collaborativa di aggregazione e standardizzazione, non una singola campagna di raccolta. 
+**Open X-Embodiment (OXE)** è un'iniziativa collaborativa di aggregazione e standardizzazione, non una singola campagna di raccolta.
 
 Il progetto parte da un problema strutturale del robot learning: molti laboratori possiedono dataset utili, ma ciascuno adotta robot, sensori, controller, frequenze di acquisizione e formati differenti. Presi separatamente, questi corpus sono spesso troppo piccoli per sostenere il pre-training di una policy generalista; concatenarli senza conversione, tuttavia, non produce un insieme semanticamente coerente.
 
@@ -20,15 +20,15 @@ La release presentata con RT-X riunisce **oltre un milione di traiettorie reali*
 
 #### Formato RLDS
 
-Il primo livello di unificazione è il formato **RLDS**, che rappresenta **ogni episodio come una sequenza di step**. 
+Il primo livello di unificazione è il formato **RLDS**, che rappresenta **ogni episodio come una sequenza di step**.
 
 Uno step può contenere l'osservazione $o_t$, l'azione $a_t$, una descrizione del task e metadati come l'indicazione di fine episodio.
 
-Questa struttura comune rende possibile caricare e mescolare le sorgenti attraverso la stessa pipeline, ma **non implica che tutti i campi siano presenti o abbiano identica semantica**. 
+Questa struttura comune rende possibile caricare e mescolare le sorgenti attraverso la stessa pipeline, ma **non implica che tutti i campi siano presenti o abbiano identica semantica**.
 
 Alcuni dataset offrono più camere, depth o propriocezione; altri soltanto una vista RGB. Anche qualità, risoluzione e durata delle traiettorie rimangono eterogenee.
 
-Per un VLA, l'istruzione linguistica $q$ funziona come interfaccia tra comportamenti differenti. Le sorgenti di OXE non possiedono però tutte annotazioni linguistiche equivalenti: alcune sono state raccolte direttamente con task description, altre richiedono etichette aggiunte o trasformate durante la conversione. Espressioni linguistiche simili possono inoltre riferirsi a condizioni iniziali, oggetti o criteri di successo diversi. La standardizzazione rende quindi le istruzioni utilizzabili nello stesso training mixture, ma non elimina rumore, granularità disomogenea o ambiguità.
+Per un VLA, l'istruzione linguistica $l$ funziona come interfaccia tra comportamenti differenti. Le sorgenti di OXE non possiedono però tutte annotazioni linguistiche equivalenti: alcune sono state raccolte direttamente con task description, altre richiedono etichette aggiunte o trasformate durante la conversione. Espressioni linguistiche simili possono inoltre riferirsi a condizioni iniziali, oggetti o criteri di successo diversi. La standardizzazione rende quindi le istruzioni utilizzabili nello stesso training mixture, ma non elimina rumore, granularità disomogenea o ambiguità.
 
 #### Spazio delle azioni condiviso
 
@@ -41,7 +41,7 @@ $$
 
 dove $\Delta x_t$, $\Delta y_t$ e $\Delta z_t$ descrivono la traslazione, $\Delta \phi_t$, $\Delta \theta_t$ e $\Delta \psi_t$ la rotazione secondo roll, pitch e yaw, mentre $g_t$ rappresenta il comando del gripper. Può essere aggiunto un segnale discreto di terminazione.
 
-Questa rappresentazione offre un vocabolario operativo condiviso, ma resta un'**approssimazione**. A seconda del dataset, **un valore può indicare un delta di posa, una velocità o un target elaborato da un controller locale**; cambiano inoltre frame di riferimento, scale, frequenze di controllo e convenzioni sulle rotazioni. 
+Questa rappresentazione offre un vocabolario operativo condiviso, ma resta un'**approssimazione**. A seconda del dataset, **un valore può indicare un delta di posa, una velocità o un target elaborato da un controller locale**; cambiano inoltre frame di riferimento, scale, frequenze di controllo e convenzioni sulle rotazioni.
 
 La stessa azione numerica può quindi produrre movimenti fisici diversi su robot differenti. Le componenti non riconducibili all'interfaccia comune possono essere ignorate o richiedere trasformazioni specifiche, con una possibile perdita di informazione.
 
@@ -49,14 +49,14 @@ La stessa azione numerica può quindi produrre movimenti fisici diversi su robot
 
 Anche la composizione del mixture richiede una scelta esplicita. Se le traiettorie fossero campionate in proporzione alla dimensione originale dei dataset, le sorgenti più grandi dominerebbero l'ottimizzazione. Se ogni dataset avesse lo stesso peso, poche traiettorie di una sorgente piccola verrebbero riutilizzate molto più spesso. Il bilanciamento determina quindi quali embodiment e skill influenzano maggiormente il modello e costituisce parte della definizione del dataset di training, non un dettaglio puramente implementativo.
 
-È infine necessario distinguere Open X-Embodiment completo dal particolare mixture impiegato in un esperimento. RT-1-X e RT-2-X sono stati **addestrati su un sottoinsieme compatibile** con le rispettive architetture, non su ogni traiettoria oggi disponibile sotto il nome OXE. 
+È infine necessario distinguere Open X-Embodiment completo dal particolare mixture impiegato in un esperimento. RT-1-X e RT-2-X sono stati **addestrati su un sottoinsieme compatibile** con le rispettive architetture, non su ogni traiettoria oggi disponibile sotto il nome OXE.
 
 Analogamente, lavori successivi come Octo e OpenVLA selezionano, filtrano e pesano subset differenti. Dire che due modelli usano Open X-Embodiment non garantisce quindi che abbiano osservato gli stessi dati.
 
 
 ### DROID
 
-**DROID**, acronimo di *Distributed Robot Interaction Dataset*, contiene circa **76.000 traiettorie e 350 ore di interazione**, raccolte da 50 operatori in 564 scene distribuite geograficamente. 
+**DROID**, acronimo di *Distributed Robot Interaction Dataset*, contiene circa **76.000 traiettorie e 350 ore di interazione**, raccolte da 50 operatori in 564 scene distribuite geograficamente.
 
 Tutti i siti usano una piattaforma Franka standardizzata, tre viste **RGB, depth, stato del robot e azioni**; questa scelta riduce l'eterogeneità hardware per aumentare quella di case, oggetti e comportamenti.
 
@@ -110,7 +110,7 @@ NVIDIA Isaac Lab, Isaac Sim e robosuite sono innanzitutto **infrastrutture di si
 
 **NVIDIA Isaac Sim** è il livello di simulazione basato su OpenUSD, rendering RTX e motore fisico PhysX. Consente di modellare robot, sensori e scene e di produrre annotazioni sincronizzate con la simulazione. **Replicator** aggiunge primitive per la *synthetic data generation*: variazioni di illuminazione, materiali, pose, camere e asset possono essere campionate programmaticamente, mentre gli annotator esportano RGB, depth, segmentazioni, bounding box, pose e altri ground truth.
 
-Questa pipeline è particolarmente utile per dati percettivi e per la **domain randomization**, con cui si cerca di evitare che il modello dipenda da un solo aspetto grafico della scena. Un corpus di immagini annotate non costituisce però ancora un dataset VLA: per il controllo servono anche una sequenza di azioni $a_t$, lo stato del robot e, quando previsto, l'istruzione $q$. La [documentazione di Isaac Sim Replicator](https://docs.isaacsim.omniverse.nvidia.com/latest/replicator_tutorials/index_tools.html) presenta i workflow di generazione.
+Questa pipeline è particolarmente utile per dati percettivi e per la **domain randomization**, con cui si cerca di evitare che il modello dipenda da un solo aspetto grafico della scena. Un corpus di immagini annotate non costituisce però ancora un dataset VLA: per il controllo servono anche una sequenza di azioni $a_t$, lo stato del robot $q_t$ e, quando previsto, l'istruzione $l$. La [documentazione di Isaac Sim Replicator](https://docs.isaacsim.omniverse.nvidia.com/latest/replicator_tutorials/index_tools.html) presenta i workflow di generazione.
 
 ### NVIDIA Isaac Lab
 

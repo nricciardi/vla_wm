@@ -17,10 +17,10 @@ $$
 in un'unica policy:
 
 $$
-\pi(a_t \mid o_t,q)
+\pi(a_t \mid o_t,l)
 $$
 
-capace di trasformare direttamente un'osservazione visiva $o_t$ e un'istruzione $q$ in un'azione robotica $a_t$.
+capace di trasformare direttamente un'osservazione visiva $o_t$ e un'istruzione $l$ in un'azione robotica $a_t$.
 
 È proprio in questo lavoro che gli autori formalizzano esplicitamente la categoria dei **Vision-Language-Action models (VLA)**: modelli nei quali un VLM viene esteso in modo da poter produrre, oltre al linguaggio, anche azioni eseguibili da un robot.
 
@@ -71,7 +71,7 @@ Quindi non viene aggiunta al VLM una nuova action head continua: il modello vien
 Concettualmente:
 
 $$
-\text{image}+q
+\text{image}+l
 \rightarrow
 \text{VLM}
 \rightarrow
@@ -152,7 +152,7 @@ mentre i robot data forniscono il grounding:
 $$
 \text{robot image}
 +
-q
+l
 \rightarrow
 \text{action}
 $$
@@ -305,13 +305,13 @@ Una volta effettuata questa proiezione, il Transformer può trattare questi vett
 Durante il controllo robotico il modello riceve principalmente:
 
 $$
-(o_t,q)
+(o_t,l)
 $$
 
 dove:
 
 * $o_t$ rappresenta l'immagine RGB corrente osservata dal robot;
-* $q$ rappresenta l'istruzione linguistica.
+* $l$ rappresenta l'istruzione linguistica.
 
 I dati robotici vengono convertiti in una struttura compatibile con i task di Visual Question Answering utilizzati dal VLM.
 
@@ -524,13 +524,13 @@ $$
 la probabilità dell'azione viene fattorizzata come:
 
 $$
-P(a_t\mid o_t,q)
+P(a_t\mid o_t,l)
 =
 \prod_{j=1}^{N}
 P(
 \tau_j
 \mid
-o_t,q,\tau_{<j}
+o_t,l,\tau_{<j}
 )
 $$
 
@@ -568,9 +568,9 @@ Per questo durante l'action decoding lo spazio degli output viene **vincolato ai
 In forma concettuale:
 
 $$
-P(\tau\mid o_t,q)
+P(\tau\mid o_t,l)
 \rightarrow
-P(\tau\mid o_t,q,\tau\in V_{action})
+P(\tau\mid o_t,l,\tau\in V_{action})
 $$
 
 con:
@@ -619,7 +619,7 @@ $$
 mentre per un esempio robotico:
 
 $$
-(o_t,q)
+(o_t,l)
 \rightarrow
 \text{action tokens}.
 $$
@@ -828,7 +828,7 @@ L'esperimento mostra però che planning semantico e controllo possono potenzialm
 $$
 \text{vision}
 +
-q
+l
 \rightarrow
 \text{language reasoning}
 \rightarrow

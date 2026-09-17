@@ -48,15 +48,15 @@ Octo viene progettato esplicitamente attorno a questa esigenza.
 La formulazione più generale può essere scritta come:
 
 $$
-\pi(a_{t:t+H} \mid o_{\leq t}, q)
+\pi(a_{t:t+H} \mid o_{\leq t}, l)
 $$
 
-dove $o_{\leq t}$ rappresenta la storia recente delle osservazioni, $q$ la specifica del task e $a_{t:t+H}$ un **chunk di azioni future**.
+dove $o_{\leq t}$ rappresenta la storia recente delle osservazioni, $l$ la specifica del task e $a_{t:t+H}$ un **chunk di azioni future**.
 
-Il task $q$ non deve necessariamente essere una frase. Octo supporta due modalità principali:
+Il task $l$ non deve necessariamente essere una frase. Octo supporta due modalità principali:
 
 $$
-q \in
+l \in
 \{
 \text{language instruction},
 \text{goal image}
@@ -88,7 +88,7 @@ $$
 D^{(i)}
 =
 \{
-(o_t^{(i)}, q^{(i)}, a_t^{(i)})
+(o_t^{(i)}, l^{(i)}, a_t^{(i)})
 \}
 $$
 
@@ -126,13 +126,13 @@ Octo cerca invece di costruire una rete in cui una parte dell'eterogeneità poss
 
 Octo **non è basato né su un Vision Encoder pre-addestrato** (come CLIP o SigLIP) **né su un LLM pre-addestrato** autoregressivo (come Llama o Vicuna).
 
-A differenza dei modelli VLA (Vision-Language-Action) classici come RT-2 o OpenVLA, Octo adotta un'architettura modulare proprietaria progettata specificamente per la robotica:Visione (nessun vision encoder pre-addestrato): 
+A differenza dei modelli VLA (Vision-Language-Action) classici come RT-2 o OpenVLA, Octo adotta un'architettura modulare proprietaria progettata specificamente per la robotica:Visione (nessun vision encoder pre-addestrato):
 
 - I frame delle telecamere e le eventuali immagini obiettivo (goal images) vengono elaborati da un semplice stack **convoluzionale leggero** (CNN/patchified tokens stile ViT) **addestrato da zero** direttamente sui dati robotici (Open X-Embodiment)
 - Linguaggio (l'unico componente parzialmente pre-addestrato): Per codificare i comandi testuali delle istruzioni usa un **piccolo encoder linguistico congelato**, T5-base (circa 111M parametri), e non un modello generativo/LLM autoregressivo.
-- Backbone: È un **Transformer encoder-decoder** (rilasciato in varianti da 27M e 93M parametri) **addestrato da zero con attenzione causale**/a blocchi per fondere i token di osservazione e di task.  
+- Backbone: È un **Transformer encoder-decoder** (rilasciato in varianti da 27M e 93M parametri) **addestrato da zero con attenzione causale**/a blocchi per fondere i token di osservazione e di task.
 - Predizione delle azioni (Diffusion Head): L'output non è generato come token discreti da un LLM, ma attraverso una **diffusion head condizionale che predice sequenze continue di traiettorie** (action chunking).
-  
+
 L'architettura può essere riassunta come:
 
 $$
@@ -169,7 +169,7 @@ Le istruzioni linguistiche vengono processate attraverso un encoder **T5-base** 
 Data un'istruzione:
 
 $$
-q =
+l =
 \text{``put the knife on the plate''}
 $$
 
@@ -194,7 +194,7 @@ Il task può essere specificato anche attraverso un'immagine che rappresenta lo 
 In questo caso:
 
 $$
-q = g
+l = g
 $$
 
 dove $g$ è la goal image.
@@ -398,7 +398,7 @@ Utilizza invece una **diffusion policy** per generare direttamente azioni contin
 Il modello deve rappresentare una distribuzione:
 
 $$
-p(a_{t:t+H} \mid o_{\leq t},q)
+p(a_{t:t+H} \mid o_{\leq t},l)
 $$
 
 potenzialmente multimodale.
@@ -596,7 +596,7 @@ $$
 a_t^{joint}
 =
 (
-\theta_1,\theta_2,\dots,\theta_n
+q_1,q_2,\dots,q_n
 )
 $$
 
@@ -670,7 +670,7 @@ Il confronto principale include:
 
 VC-1 è stato selezionato come baseline perché rappresenta un'alternativa plausibile al pre-training end-to-end di Octo. Fornisce infatti feature visive già adatte a locomozione, navigazione e manipolazione, ma **non è una policy robotica**: durante il pre-training non apprende direttamente la relazione tra osservazioni, task e azioni. Nel confronto, i pesi VC-1 inizializzano un encoder ViT, quindi l'intera rete viene fine-tuned sulle dimostrazioni target per predire le azioni con una loss MSE.
 
-Il confronto separa quindi due forme di trasferimento. VC-1 trasferisce soprattutto regolarità percettive apprese da immagini e video; Octo trasferisce anche una rappresentazione visuomotoria ottenuta da traiettorie robotiche, action chunk e task conditioning. 
+Il confronto separa quindi due forme di trasferimento. VC-1 trasferisce soprattutto regolarità percettive apprese da immagini e video; Octo trasferisce anche una rappresentazione visuomotoria ottenuta da traiettorie robotiche, action chunk e task conditioning.
 
 La media riportata sulle sei evaluation è:
 
@@ -718,12 +718,12 @@ Un'altra evaluation sostituisce il controllo cartesiano con **joint position con
 La configurazione articolare può essere rappresentata come:
 
 $$
-\boldsymbol{\theta}_t
+q_t
 =
 (
-\theta_{1,t},
+q_{1,t},
 \dots,
-\theta_{n,t}
+q_{n,t}
 )
 $$
 

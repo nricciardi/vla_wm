@@ -109,7 +109,7 @@ import simpler_env
 
 env = simpler_env.make("google_robot_pick_coke_can")
 obs, info = env.reset()
-q = env.get_language_instruction()
+l = env.get_language_instruction()
 ```
 
 ### RoboCasa
