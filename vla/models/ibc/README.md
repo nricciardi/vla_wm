@@ -1,6 +1,8 @@
 # Implicit Behavioral Cloning
 
-**Implicit Behavioral Cloning (IBC)** è un metodo di imitation learning che rappresenta una policy mediante un **energy-based model (EBM)**. Il lavoro non introduce un VLA completo: manca un task conditioning linguistico generalista e ogni policy è addestrata per lo specifico dominio sperimentale. Il suo interesse per i VLA risiede nel modo in cui trasforma la predizione delle azioni da regressione esplicita a problema di compatibilità tra osservazioni e azioni.
+**Implicit Behavioral Cloning (IBC)** è un metodo di imitation learning che rappresenta una policy mediante un **energy-based model (EBM)**. 
+
+Il lavoro non introduce un VLA completo: **manca un task conditioning linguistico** generalista e ogni policy è addestrata per lo specifico dominio sperimentale. Il suo interesse per i VLA risiede nel modo in cui trasforma la predizione delle azioni da regressione esplicita a problema di compatibilità tra osservazioni e azioni.
 
 Il punto di partenza è il behavioral cloning. Dato un dataset di dimostrazioni
 
@@ -18,7 +20,7 @@ Se la loss è un errore quadratico, il modello viene spinto verso la media condi
 
 ## Policy implicita
 
-IBC apprende invece una funzione scalare
+IBC *apprende* invece una funzione scalare
 
 $$
 E_\theta(o,a)\in\mathbb{R},
@@ -64,13 +66,13 @@ La scelta e il raffinamento dei negativi sono centrali. Esempi troppo facili for
 
 ## Inferenza
 
-Al momento dell'esecuzione occorre risolvere il problema di minimizzazione nello spazio delle azioni. Il lavoro confronta procedure **derivative-free**, una variante autoregressiva che ottimizza le componenti per coordinate e Langevin sampling basato sul gradiente dell'energia.
+Al momento dell'esecuzione occorre risolvere il problema di minimizzazione nello spazio delle azioni. Il lavoro confronta procedure **derivative-free**, una **variante autoregressiva** che ottimizza le componenti per coordinate e Langevin **sampling basato sul gradiente dell'energia**.
 
 Nella procedura sampling-based vengono generate più azioni candidate entro i limiti di $\mathcal{A}$, valutate dalla rete e progressivamente ricampionate attorno alle candidate con energia minore. Questa ricerca rende la policy più flessibile di un singolo passaggio feed-forward, ma introduce costo computazionale e iperparametri di inferenza.
 
 ## Perché le policy implicite aiutano
 
-Una policy esplicita continua deve attraversare tutti i valori intermedi quando approssima una funzione discontinua. La composizione tra una funzione energetica continua e l'operatore $\arg\min$ può invece far passare bruscamente la soluzione da un minimo all'altro. Questo consente di rappresentare decisioni come “aggirare l'ostacolo a sinistra oppure a destra” senza interpolare necessariamente tra le due strategie.
+Una policy esplicita continua deve attraversare *tutti i valori intermedi* quando approssima una funzione discontinua. La composizione tra una funzione energetica continua e l'operatore $\arg\min$ può invece **far passare bruscamente la soluzione da un minimo all'altro**. Questo consente di rappresentare decisioni come *"aggirare l'ostacolo a sinistra oppure a destra"* senza interpolare necessariamente tra le due strategie.
 
 Lo stesso meccanismo permette di descrivere **mapping set-valued**, nei quali più azioni sono simultaneamente corrette. L'energia non è costretta a scegliere in anticipo una sola modalità: può assegnare valori bassi a regioni separate dell'action space e lasciare all'inferenza la selezione finale.
 
@@ -78,15 +80,10 @@ Lo stesso meccanismo permette di descrivere **mapping set-valued**, nei quali pi
 
 La valutazione comprende sei famiglie di esperimenti. I task **D4RL Human-Experts** includono domini Franka Kitchen e Adroit con action space fino a 30 dimensioni. Seguono un particle integrator, block pushing, planar sweeping e un task simulato di sweeping bimanuale con due KUKA IIWA, nel quale 1.000 dimostrazioni scripted controllano complessivamente 12 DoF cartesiani.
 
-Gli esperimenti real-world usano un **xArm6** dotato di end-effector cilindrico. La policy osserva immagini RGB prospettiche a 5 Hz e apprende da dimostrazioni teleoperate quattro task: spingere due blocchi verso target assegnati; risolvere una variante multimodale in cui ordine e target possono cambiare; inserire un blocco con tolleranza di 1 mm; separare blocchi blu e gialli.
+Gli esperimenti real-world usano un *xArm6* dotato di **end-effector cilindrico**. La policy osserva immagini RGB prospettiche a 5 Hz e apprende da dimostrazioni teleoperate quattro task: spingere due blocchi verso target assegnati; risolvere una variante multimodale in cui ordine e target possono cambiare; inserire un blocco con tolleranza di 1 mm; separare blocchi blu e gialli.
 
 I dataset reali contengono rispettivamente 95, 410, 223 e 502 dimostrazioni. Questa distribuzione rende esplicito che IBC non è pre-addestrato su un corpus generalista: ogni esperimento usa dati raccolti per il comportamento target. Il confronto principale mantiene simili gli encoder e contrappone la policy EBM a behavioral cloning esplicito con loss MSE.
 
-## Rapporto con i VLA
-
-IBC anticipa un tema centrale delle action head moderne: **un'azione robotica può avere una distribuzione multimodale che una regressione unimodale rappresenta male**. Diffusion policy, flow matching e altri decoder generativi affrontano lo stesso problema con meccanismi differenti e spesso producono direttamente action chunk continui.
-
-L'EBM offre inoltre una lettura utile dell'azione come compatibilità condizionata sul contesto. IBC, tuttavia, non possiede un language encoder, non usa pre-training vision-language e non condivide una policy tra un grande numero di task o embodiment. È quindi un precursore sul piano della rappresentazione delle azioni, non un VLA.
 
 #### Novelty
 
