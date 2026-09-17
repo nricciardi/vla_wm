@@ -263,14 +263,134 @@ La policy possiede inoltre una componente semantica meno ampia rispetto ai VLA c
 
 ### OpenVLA
 
+**OpenVLA (2024)** porta l'impostazione di RT-2 in un modello interamente aperto e progettato per il fine-tuning. Parte dal VLM **Prismatic-7B**, che combina encoder visuali DINOv2 e SigLIP con un backbone Llama 2 da 7 miliardi di parametri, e lo addestra a generare azioni robotiche come token discreti.
+
+Il training utilizza circa **970.000 traiettorie real-world** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti. Il modello viene valutato direttamente sui setup **WidowX** di BridgeData V2 e **Google Robot** della famiglia RT; viene inoltre adattato a due setup Franka, Franka-Tabletop a 5 Hz e Franka-DROID a 15 Hz.
+
+Ogni componente continua dell'azione viene normalizzata, discretizzata in 256 bin e associata a uno dei token meno usati del vocabolario Llama. Il language model può così apprendere con lo stesso obiettivo autoregressivo la sequenza che rappresenta
+
+$$
+a_t=(\Delta x_t,\Delta y_t,\Delta z_t,
+\Delta\phi_t,\Delta\theta_t,\Delta\psi_t,g_t),
+$$
+
+dove le prime sei componenti descrivono la variazione di posa dell'end-effector e $g_t$ il gripper.
+
+#### Novelty
+
+OpenVLA offre una delle prime implementazioni **open-source e riproducibili di un VLA da 7B parametri**, includendo checkpoint, pipeline PyTorch, training su mixture RLDS e supporto al fine-tuning. La fusione di DINOv2 e SigLIP combina feature sensibili alla struttura spaziale con rappresentazioni allineate semanticamente al linguaggio.
+
+Il modello mostra inoltre che una policy molto più piccola di RT-2-X può beneficiare congiuntamente del pre-training web del VLM e del pre-training su un grande corpus robotico. Con LoRA è possibile adattare soltanto una piccola frazione dei parametri mantenendo, nel protocollo studiato, prestazioni vicine al full fine-tuning.
+
+#### Limiti
+
+La discretizzazione introduce errore di quantizzazione e la generazione autoregressiva di più token per ogni azione limita la frequenza di controllo. La versione originaria predice inoltre una singola azione per query, senza un action chunk temporale esplicito.
+
+Il fine-tuning del VLM esclusivamente sui robot data può degradare parte della conoscenza semantica acquisita sul web: RT-2-X, che mantiene il co-fine-tuning vision-language, rimane più forte su alcune richieste basate su concetti Internet molto lontani dai dati robotici. Dimensione e costo di inferenza restano infine elevati rispetto a policy robotiche specializzate.
+
+L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prismatic, tokenizzazione delle azioni, training mixture, evaluation e adattamento tramite LoRA.
+
+## Flow Matching VLA
 
 ### Pi-0
 
 
 
+
+
+## Reasoning e planning nei VLA
+
+### Gemini Robotics
+
+### Pi 0.5
+
 ### GR00T
 
 
+## Real-time VLA
+
+### SmolVLA
+
+
+### TinyVLA
+
+
+### FAST
+
+### OpenVLA-OFT
+
+## Tassonomia trasversale dei VLA
+
+La successione cronologica dei modelli non basta a descrivere il panorama dei VLA. Due sistemi contemporanei possono condividere lo stesso VLM ma differire completamente nel decoder delle azioni; viceversa, policy con action head simili possono nascere da strategie di pre-training diverse. È quindi utile organizzare i modelli lungo **assi indipendenti**, evitando di trasformare le categorie seguenti in una singola classifica.
+
+### Rappresentazione delle azioni
+
+La rappresentazione dell'azione determina che cosa viene predetto dal modello e quale loss collega la rappresentazione multimodale al controllo.
+
+| Famiglia | Rappresentazione | Esempi | Conseguenza principale |
+| --- | --- | --- | --- |
+| **Regressione o generazione continua** | Il decoder produce direttamente valori continui o parametri di una distribuzione | ACT | Evita la quantizzazione, ma deve modellare esplicitamente multimodalità e precisione |
+| **Policy implicita** | L'azione minimizza una funzione energetica $E_\theta(o_t,a)$ | IBC | Rappresenta bene modalità separate, ma richiede ottimizzazione durante l'inferenza |
+| **Token discreti per dimensione** | Ogni componente continua viene assegnata a un bin e generata come token | RT-1, RT-2, OpenVLA | Riusa l'obiettivo next-token del Transformer, introducendo quantizzazione e decoding sequenziale |
+| **Tokenizzazione di traiettorie** | Un tokenizer comprime un intero action chunk in una sequenza discreta più corta | FAST e FAST+ | Mantiene un'interfaccia autoregressiva riducendo il numero di token necessari |
+| **Diffusion action head** | Una sequenza continua viene ottenuta rimuovendo progressivamente rumore | Octo | Modella distribuzioni multimodali e action chunk, ma richiede più passi di denoising |
+| **Flow matching** | Il decoder apprende un campo di velocità che trasporta rumore verso una traiettoria di azioni | $\pi_0$, $\pi_{0.5}$, GR00T N1 | Produce chunk continui con pochi passi di integrazione, separando spesso il VLM dall'action expert |
+
+Queste famiglie possono essere combinate. Un VLM può ricevere supervisione da action token durante il pre-training e utilizzare un decoder continuo durante il post-training; allo stesso modo, “diffusion” descrive il meccanismo generativo, non il tipo di embodiment o di task conditioning.
+
+### Modellazione temporale e action chunking
+
+La seconda distinzione riguarda **quanta dinamica futura viene rappresentata in una singola inferenza** e come la policy incorpora nuove osservazioni.
+
+| Schema temporale | Forma concettuale | Esempi e ruolo |
+| --- | --- | --- |
+| **Single-step action prediction** | $\pi(a_t\mid o_t,q)$ | RT-1, RT-2 e OpenVLA originario producono l'azione del passo corrente |
+| **History window** | $\pi(a_t\mid o_{t-h:t},q)$ | Una breve sequenza di osservazioni disambigua velocità, contatti e fase del task; RT-1 e Octo ne sono esempi |
+| **Trajectory prediction** | $\pi(a_{t:t+H}\mid o_{\leq t},q)$ | Il modello rappresenta esplicitamente l'evoluzione futura locale, anziché azioni indipendenti |
+| **Action chunks** | Un blocco di $H$ comandi viene generato congiuntamente | ACT, Octo, $\pi_0$ e GR00T riducono l'orizzonte decisionale effettivo e migliorano la coerenza del moto |
+| **Receding-horizon control** | Si genera un chunk, se ne esegue soltanto un prefisso e si pianifica di nuovo | Recupera reattività rispetto all'esecuzione open loop dell'intero chunk |
+| **Closed-loop replanning** | Nuove osservazioni aggiornano continuamente la decisione | È il principio generale che accomuna policy single-step e chunked quando vengono rieseguite durante il task |
+
+**Action chunking e closed loop non sono opposti**. Un modello può prevedere una traiettoria di $H$ passi, eseguire solo i primi $h<H$ comandi e poi produrre un nuovo chunk. La scelta di $H$ e $h$ bilancia coerenza temporale, costo di inferenza e capacità di reagire agli errori.
+
+### Pre-training e adaptation
+
+I VLA differiscono anche per il punto da cui nasce la policy. Le categorie sono sovrapposte perché molti sistemi moderni combinano conoscenza web, video umani e traiettorie robotiche.
+
+| Strategia | Punto di partenza | Modelli rappresentativi | Cosa viene trasferito |
+| --- | --- | --- | --- |
+| **Web-pretrained VLM → robot policy** | Un VLM già addestrato su immagini, testo o video viene adattato alle azioni | RT-2, OpenVLA, Gemini Robotics | Semantica, riconoscimento visuale e capacità linguistiche |
+| **Robot-data pretraining** | Una policy viene pre-addestrata direttamente su mixture di traiettorie | Octo | Primitive visuomotorie, dinamica locale e struttura degli action space |
+| **Pre-training ibrido** | VLM e action expert vengono combinati o co-addestrati con dati robotici e altre modalità | $\pi_0$, GR00T | Conoscenza semantica più prior motori continui e multi-embodiment |
+| **Downstream adaptation** | Un checkpoint generalista viene specializzato con poche dimostrazioni target | Octo, OpenVLA, $\pi_0$, GR00T | Nuovo task, sensore, action space o embodiment |
+
+RT-2, OpenVLA e Gemini Robotics illustrano la trasformazione diretta di una base vision-language in controller. Octo isola meglio il valore del robot-data pretraining. $\pi_0$ e GR00T non appartengono esclusivamente a una sola colonna: usano componenti vision-language pre-addestrati, ma la loro capacità di controllo dipende da grandi mixture robotici e da action expert dedicati.
+
+### Reasoning e planning nei VLA
+
+Il termine **reasoning** può indicare capacità molto diverse. È utile separare il ragionamento semantico necessario a interpretare $q$ dalla pianificazione temporale e dalla generazione dei comandi motori.
+
+$$
+q,o_{\leq t}
+\rightarrow
+\text{high-level reasoning}
+\rightarrow
+\text{subgoal o skill}
+\rightarrow
+\text{low-level action decoding}
+$$
+
+Il **task decomposition** trasforma un obiettivo lungo in una catena di skill; la **subgoal prediction** produce uno stato intermedio, una frase o una rappresentazione latente; il **language planning** costruisce una sequenza simbolica; il controller low-level traduce infine il passo corrente in azioni. Ragionare prima dell'action decoding rende più leggibile la separazione tra “che cosa fare” e “come muoversi”, ma introduce latenza e nuovi punti di errore.
+
+| Famiglia | Organizzazione del reasoning | Caratteristica |
+| --- | --- | --- |
+| **[Gemini Robotics](https://arxiv.org/abs/2503.20020)** | Un VLA Gemini-based integra comprensione multimodale, decomposizione e controllo; la variante Gemini Robotics-ER enfatizza reasoning spaziale, planning e progress estimation | Collega capacità web-scale a pianificazione e azione multi-embodiment |
+| **[$\pi_{0.5}$](https://arxiv.org/abs/2504.16054)** | Lo stesso modello viene co-addestrato a produrre azioni e target semantici di alto livello | Può alternare predizione di subtask e controllo low-level, favorendo generalizzazione open-world |
+| **[GR00T](https://research.nvidia.com/publication/2025-03_nvidia-isaac-gr00t-n1-open-foundation-model-humanoid-robots)** | Architettura dual-system: un VLM interpreta contesto e istruzione, mentre un action expert generativo produce traiettorie | Separa rappresentazione vision-language e generazione motoria per umanoidi e altri embodiment |
+| **Reasoning-augmented VLA** | Il VLA riceve piani, chain of skills, affordance o subgoal generati esplicitamente | Migliora task lunghi se le rappresentazioni intermedie sono verificabili e grounded |
+| **World-model-assisted VLA** | Un world model predice conseguenze o video futuri e aiuta a scegliere piano o azione | Introduce look-ahead, ma efficacia e costo dipendono dalla fedeltà della dinamica appresa |
+
+Non ogni output testuale costituisce vero planning e non ogni action chunk implica reasoning. Una tassonomia utile deve quindi chiedere **dove avviene la deliberazione**, quale rappresentazione intermedia viene prodotta, come viene verificato il progresso e con quale frequenza il piano viene corretto attraverso nuove osservazioni.
 
 
 
