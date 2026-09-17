@@ -4,6 +4,10 @@
 
 RoboEval affronta il problema combinando tre elementi: una suite simulata di task bimanuali con variazioni controllate, un dataset di dimostrazioni umane e una strumentazione uniforme di metriche comportamentali e di outcome. Il contributo non consiste nel sostituire il successo binario con un nuovo punteggio unico. Al contrario, mantiene separate misure che descrivono proprietà differenti, perché aggregarle prematuramente nasconderebbe gli stessi trade-off che il benchmark vuole rendere osservabili.
 
+![Struttura generale di RoboEval](../figures/roboeval_overview.webp)
+
+*RoboEval combina task a difficoltà crescente, variazioni strutturate, dimostrazioni teleoperate e metriche che separano outcome e qualità del comportamento. Fonte: [paper RoboEval](https://arxiv.org/abs/2507.00435).*
+
 ## Obiettivo e principi di progetto
 
 Il framework è costruito attorno a **diversità, interpretabilità ed estensibilità**. La diversità riguarda sia la struttura temporale dei task sia le capacità motorie richieste: azioni a un solo braccio, coordinazione stretta tra due bracci, trasferimenti, sollevamento, rotazione e attività composte. L'interpretabilità deriva dalla possibilità di associare un fallimento a uno stadio del task o a una proprietà misurabile del moto. L'estensibilità è ottenuta separando definizione del task, generazione delle varianti e logica di valutazione, così da poter aggiungere ambienti e metriche senza cambiare l'intero protocollo.
@@ -51,6 +55,10 @@ La prima release comprende **otto task di manipolazione bimanuale**:
 - **Pick Book From Table**, che richiede di localizzare, afferrare e rimuovere un libro dal piano;
 
 - **Rotate Valve**, centrato sulla rotazione controllata di una valvola.
+
+![Gli otto task bimanuali di RoboEval](../figures/roboeval_tasks.webp)
+
+*Gli otto task richiedono combinazioni differenti di presa, trasferimento, rotazione e coordinazione tra i due bracci. Le istruzioni riportate nella figura sono quelle associate agli ambienti nel paper. Fonte: [paper RoboEval, figura 2](https://arxiv.org/abs/2507.00435).*
 
 I task coprono contesti tabletop, di servizio e industriali e sono eseguiti con un **embodiment simulato a due bracci**. Il paper descrive uno spazio di controllo continuo compatibile con comandi articolari e delta cartesiani, senza fondare il benchmark sulla replica dichiarata di uno specifico robot commerciale. Questa scelta rende più appropriato parlare di setup bimanuale simulato che attribuire i risultati a un hardware reale non valutato nel lavoro.
 

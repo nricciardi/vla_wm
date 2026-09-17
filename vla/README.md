@@ -450,36 +450,3 @@ In breve **LIBERO** privilegia il trasferimento tra fattori semantici, **CALVIN*
 
 Dettagli specifici [qui](evaluation/README.md).
 
-
-### RobotEval (2025)
-
-**RoboEval** è un framework di valutazione per la manipolazione bimanuale che affianca al *success rate* una descrizione strutturata della qualità dell'esecuzione. La prima release comprende otto task simulati, da operazioni relativamente brevi come sollevare un vassoio o ruotare una valvola fino ad attività multistadio come impacchettare oggetti, ciascuno proposto con variazioni controllate di posizione e orientamento. Il benchmark usa un embodiment a due bracci e mette a disposizione oltre 3.000 dimostrazioni esperte raccolte tramite teleoperazione in realtà virtuale, con osservazioni visive, propriocezione e stato annotato della scena.
-
-La valutazione separa **efficienza**, **sicurezza e stabilità**, **coordinazione bimanuale** ed **esito del task**. Lunghezze dei percorsi, tempo di completamento, jerk, collisioni, perdite della presa e disallineamento tra i due end-effector permettono di distinguere policy che hanno lo stesso successo binario ma movimenti molto diversi. Indicatori di avanzamento per stadi mostrano inoltre fin dove arriva una policy quando non conclude il task. Gli esperimenti confrontano ACT, Diffusion Policy, GR00T N1.6, X-VLA e $\pi_0.5$, usando le traiettorie umane come riferimento comportamentale.
-
-#### Novelty
-
-Il contributo distintivo consiste nel trattare la valutazione come un problema **multidimensionale e diagnostico**: il successo stabilisce se il goal è stato raggiunto, mentre le metriche comportamentali spiegano con quale efficienza, fluidità, stabilità e coordinazione. Il lavoro verifica empiricamente che tali misure siano complementari, discriminative tra policy e informative anche al variare della difficoltà spaziale.
-
-#### Limiti
-
-La release iniziale è interamente simulata, usa un solo setup bimanuale e varia soprattutto posizione e orientamento degli oggetti. Non copre ancora in modo sistematico illuminazione, distrattori, proprietà fisiche o trasferimento all'hardware reale; alcune metriche sono inoltre fortemente dipendenti dal task e una traiettoria più liscia non implica necessariamente un controllo più competente, come mostra il confronto tra policy e teleoperazione umana.
-
-L'[approfondimento su RoboEval](roboeval/README.md) descrive formalizzazione dei task, dataset, famiglie di metriche, protocollo sperimentale, risultati e limiti interpretativi del benchmark.
-
-
-### RoboPlayground (2026)
-
-**RoboPlayground** propone di trasformare la costruzione di un benchmark da attività di programmazione riservata agli esperti a processo interattivo guidato dal linguaggio. Una richiesta testuale viene compilata in una specifica eseguibile che rende espliciti asset, distribuzione degli stati iniziali, predicato di successo, istruzione canonica e parafrasi. Il sistema non produce soltanto una scena isolata: genera una **famiglia versionata di task** in un dominio fisico strutturato di manipolazione di blocchi in MuJoCo, così che modifiche semantiche, visuali e comportamentali restino controllabili e riproducibili.
-
-La pipeline usa uno schema intermedio, generazione di codice assistita da esempi e API, controlli di fattibilità, validazione sintattica e fisica, agenti specializzati di riparazione e uno storico che collega ogni variante al task di origine. La valutazione comprende uno studio con 26 utenti, un confronto di sei policy addestrate sullo stesso insieme di dimostrazioni generate con CuTAMP e un'analisi della diversità dei task prodotti da autori differenti. Gli esperimenti mostrano che le perturbazioni comportamentali, come disfare e ricostruire una pila o rispettare una sequenza composizionale, espongono fallimenti non visibili sui task in-distribution.
-
-#### Novelty
-
-La novità non è soltanto usare un LLM per generare ambienti, ma fare del linguaggio una **interfaccia eseguibile e partecipativa per la valutazione**. RoboPlayground conserva lineage, condizioni di successo e distribuzioni iniziali, conciliando l'apertura a contributori non esperti con la necessità scientifica di rieseguire e confrontare le prove.
-
-#### Limiti
-
-L'istanza studiata è volutamente circoscritta a blocchi rigidi, una camera fissa e una configurazione MuJoCo standardizzata. La varietà linguistica non coincide quindi con varietà di oggetti, contatti o embodiment reali; inoltre la correttezza semantica dipende ancora da giudizi umani o da un valutatore LLM, mentre la validazione automatica garantisce soprattutto eseguibilità e stabilità del goal, non che ogni task generato sia significativo o che la soluzione sia raggiungibile da una policy concreta.
-
-L'[approfondimento su RoboPlayground](roboplayground/README.md) ricostruisce rappresentazione dei task, pipeline di compilazione e riparazione, steering contestuale, studio di usabilità, dati di training e risultati di generalizzazione.

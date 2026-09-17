@@ -4,6 +4,10 @@
 
 RoboPlayground propone una soluzione diversa: usare il linguaggio naturale come **interfaccia di authoring eseguibile** sopra un dominio fisico strutturato. L'utente descrive l'attività e può successivamente modificarne oggetti, relazioni, vincoli o criterio di successo. Il sistema traduce la richiesta in codice MuJoCo, verifica che la scena sia eseguibile e fisicamente coerente e conserva la genealogia delle versioni. Il risultato non è una descrizione libera né un singolo episodio, ma un artefatto condivisibile che definisce una famiglia riproducibile di task.
 
+![Esempio di trasformazione tra stato iniziale e goal](../figures/roboplayground_task.webp)
+
+*Una specifica linguistica può trasformare la disposizione casuale iniziale in un goal strutturato, in questo caso pile ordinate per colore. Fonte: [sito RoboPlayground](https://roboplayground.github.io/).*
+
 ## Dalla valutazione statica alla valutazione partecipativa
 
 Il lavoro persegue quattro proprietà. **Accessibilità** significa permettere anche a chi non conosce le API del simulatore di esprimere il comportamento da testare. **Crescita continua** indica che lo spazio di valutazione può ampliarsi attraverso contributi successivi. **Riproducibilità** richiede che una specifica possa essere rieseguita su policy diverse. **Controllo strutturato** limita la libertà linguistica affinché variazioni e failure mode restino interpretabili.
@@ -43,6 +47,10 @@ La camera fissa è anche parte della semantica del dominio. Nei task con simboli
 ## Pipeline di compilazione dal linguaggio
 
 La trasformazione della richiesta in un task eseguibile attraversa quattro blocchi: **orchestrazione**, **generazione del codice**, **validazione con riparazione** e **context steering**. La modularità consente di distinguere gli errori di comprensione dell'intento da quelli sintattici, fisici o relativi allo storico della conversazione.
+
+![Pipeline di compilazione, steering e validazione di RoboPlayground](../figures/roboplayground_pipeline.webp)
+
+*La descrizione dell'utente viene prima strutturata, poi compilata in codice e infine sottoposta a validatori e agenti di riparazione. Lo steering conserva storia e lineage delle varianti. Fonte: [paper RoboPlayground](https://arxiv.org/abs/2604.05226).*
 
 ### Orchestrazione e schema intermedio
 
