@@ -141,7 +141,7 @@ L'[approfondimento su ACT](models/act/README.md) descrive dataset, architettura 
 
 **RT-1** sostituisce la composizione di skill separate con una singola policy che riceve una breve storia di immagini e un'istruzione $l$, quindi produce direttamente token di azione.
 
-Il dataset principale contiene oltre 130.000 episodi reali raccolti in 17 mesi con 13 Everyday Robots mobile manipulators e copre più di 700 task in ambienti di tipo office kitchen.
+Il dataset principale contiene oltre 130,000 episodi reali raccolti in 17 mesi con 13 Everyday Robots mobile manipulators e copre più di 700 task in ambienti di tipo office kitchen.
 
 La policy controlla braccio, gripper e base mobile mediante componenti continue discretizzate in 256 bin, oltre a un mode token che seleziona braccio, base o terminazione.
 
@@ -166,7 +166,7 @@ L'[approfondimento su RT-1](models/rt1/README.md) presenta dataset, architettura
 
 ![Overview](figures/rt2_overview.png)
 
-Il training combina i dati vision-language originali di PaLI-X o PaLM-E con le oltre 130.000 traiettorie robotiche di RT-1, raccolte con 13 Everyday Robots mobile manipulators.
+Il training combina i dati vision-language originali di PaLI-X o PaLM-E con le oltre 130,000 traiettorie robotiche di RT-1, raccolte con 13 Everyday Robots mobile manipulators.
 
 Il lavoro considera modelli da 5 a 55 miliardi di parametri e include anche una valutazione sul diverso embodiment di Language Table.
 
@@ -265,7 +265,7 @@ La policy possiede inoltre una componente semantica meno ampia rispetto ai VLA c
 
 **OpenVLA** porta l'impostazione di RT-2 in un modello interamente aperto e progettato per il fine-tuning. Parte dal VLM *Prismatic-7B*, che combina encoder visuali **DINOv2 e SigLIP** con un backbone **Llama 2** da 7 miliardi di parametri, e lo addestra a generare **azioni robotiche come token discreti**.
 
-Il training utilizza circa **970.000 traiettorie *real-world*** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti.
+Il training utilizza circa **970,000 traiettorie *real-world*** selezionate da Open X-Embodiment. Il mixture copre task, scene ed embodiment differenti.
 
 Il modello viene valutato direttamente sui setup *WidowX* di BridgeData V2 e *Google Robot* della famiglia RT; viene inoltre adattato a due setup Franka, Franka-Tabletop a 5 Hz e Franka-DROID a 15 Hz.
 
@@ -309,7 +309,7 @@ L'[approfondimento su OpenVLA](models/openvla/README.md) descrive backbone Prism
 Il modello riceve **due o tre immagini**, l'**istruzione linguistica** $l$ e lo **stato propriocettivo** $q_t$, quindi produce mediante **flow matching un chunk di 50 azioni future**.
 Questa soluzione evita la quantizzazione di RT-2 e OpenVLA e consente controllo destro fino a 50 Hz.
 
-Il pre-training combina un subset di Open X-Embodiment con oltre **10.000 ore di dati proprietari**, pari a 903 milioni di timestep, raccolti su sette configurazioni robotiche e 68 task complessi. Gli embodiment comprendono UR5e e Franka a singolo braccio, setup bimanuali UR5e, Trossen e ARX/AgileX, e manipolatori mobili bimanuali. Il modello usa vettori di stato e azione zero-padded fino alla dimensionalità massima, preservando una singola architettura tra piattaforme differenti.
+Il pre-training combina un subset di Open X-Embodiment con oltre **10,000 ore di dati proprietari**, pari a 903 milioni di timestep, raccolti su sette configurazioni robotiche e 68 task complessi. Gli embodiment comprendono UR5e e Franka a singolo braccio, setup bimanuali UR5e, Trossen e ARX/AgileX, e manipolatori mobili bimanuali. Il modello usa vettori di stato e azione zero-padded fino alla dimensionalità massima, preservando una singola architettura tra piattaforme differenti.
 
 
 La ricetta separa **pre-training generalista** e **post-training task-specifico**.
@@ -342,9 +342,51 @@ L'[approfondimento su $\pi_0$](models/pi0/README.md) sviluppa architettura, flow
 
 ## Reasoning e planning nei VLA
 
-### Gemini Robotics
+I VLA più recenti non si limitano a collegare un comando linguistico a un movimento locale. Per affrontare attività di più minuti devono anche **interpretare relazioni spaziali, selezionare subtask e aggiornare il piano quando cambia la scena**. Gemini Robotics, $\pi_{0.5}$ e GR00T N1 percorrono tre strade differenti: trasferimento dell'embodied reasoning da un frontier VLM, gerarchia semantica co-addestrata con il controllo e architettura dual-system per embodiment eterogenei.
 
-### Pi 0.5
+### Gemini Robotics (2025)
+
+**Gemini Robotics** è una famiglia basata su Gemini 2.0 che distingue due ruoli. **Gemini Robotics-ER** è un VLM specializzato nell'*embodied reasoning*: localizza oggetti e affordance, predice punti, grasp, traiettorie e bounding box 3D e può generare codice per orchestrare un robot. **Gemini Robotics** è invece il VLA che trasforma immagini, propriocezione e istruzione $l$ in action chunk eseguibili.
+
+La policy usa un **backbone distillato ospitato nel cloud** e un **action decoder locale**. Il primo conserva le capacità semantiche del modello ER e presenta una latenza inferiore a 160 ms; il sistema completo produce chunk low-level in circa 250 ms e raggiunge una frequenza effettiva di 50 Hz grazie al chunking.
+
+Il training robotico usa migliaia di ore di dimostrazioni teleoperate, raccolte in dodici mesi su una flotta di **ALOHA 2**, e le combina con documenti web, codice, immagini, audio, video, visual question answering e supervisioni di embodied reasoning. Il modello viene valutato su manipolazione bimanuale, oggetti deformabili, 85 condizioni di generalizzazione visuale, linguistica e motoria e, dopo fine-tuning, su task lunghi come origami e preparazione di un lunch-box.
+
+Il trasferimento verso embodiment nuovi viene studiato adattando il checkpoint a un **Franka bimanuale** e all'umanoide **Apollo di Apptronik**. Si tratta di adaptation con dati target, non di controllo zero-shot: locomozione ed equilibrio dell'umanoide non rientrano nella valutazione.
+
+![Gemini Robotics combina un backbone in cloud con un decoder locale](models/gemini_robotics/figures/gemini_robotics_architecture.png)
+
+#### Novelty
+
+La novelty consiste nel portare **world knowledge ed embodied reasoning di un frontier multimodal model nel controllo bimanuale ad alta destrezza**, separando il calcolo semantico in cloud dal decoding locale necessario per il loop motorio. Il lavoro valuta inoltre in modo distinto generalizzazione visuale, linguistica e delle azioni e mostra adaptation rapida verso task e robot differenti.
+
+#### Limiti
+
+Modello, dati e pipeline sono proprietari: non vengono pubblicati pesi, numero di parametri, composizione esatta del mixture o dettagli sufficienti a replicare l'action decoder. L'inferenza dipende dal cloud e i task lunghi richiedono ancora 2,000–5,000 dimostrazioni di specializzazione; il trasferimento cross-embodiment richiede fine-tuning e resta concentrato sulla manipolazione tabletop.
+
+L'[approfondimento su Gemini Robotics](models/gemini_robotics/README.md) distingue il modello ER dal VLA, analizza architettura, dati, benchmark di generalizzazione, specializzazione, nuovi embodiment e sicurezza.
+
+### $\pi_{0.5}$ (2025)
+
+**$\pi_{0.5}$** estende $\pi_0$ per la generalizzazione in case non presenti nel training. Il modello riceve immagini, istruzione globale $l$ e stato del robot $q_t$, predice prima un **subtask testuale** $\hat l_t$ e genera poi un chunk di 50 azioni continue condizionato da quel subtask.
+
+La ricetta usa due fasi. Nel pre-training, azioni compresse con **FAST**, caption, bounding box e subtask sono tutti trattati come token autoregressivi. Nel post-training viene aggiunto l'**action expert flow-matching** da 300 milioni di parametri, che produce azioni continue con dieci passi di integrazione e consente al controller di operare a 50 Hz.
+
+Il mixture comprende circa **400 ore di mobile manipulation in 100 abitazioni**, manipolatori statici raccolti in ambienti diversi, dati cross-embodiment di laboratorio e Open X-Embodiment, oltre a image captioning, VQA, object localization e *verbal instruction*. In quest'ultima modalità un supervisore guida il robot scegliendo verbalmente i subtask, fornendo dimostrazioni high-level senza teleoperare direttamente ogni giunto.
+
+L'evaluation usa due manipolatori mobili con due bracci a 6 DoF, quattro camere, base olonomica e torso sollevabile. Il modello riordina cucine e camere da letto in mock homes e abitazioni reali mai viste, svolgendo task quali riporre stoviglie, usare cassetti, raccogliere indumenti e rifare il letto.
+
+![Pi 0.5 alterna predizione high-level e controllo low-level](models/pi05/figures/pi05_training_and_inference.png)
+
+#### Novelty
+
+La novelty è il **co-training di azioni multi-embodiment e supervisioni semantiche eterogenee in una singola policy gerarchica**. La combinazione FAST più flow matching separa l'interfaccia efficiente del pre-training dal decoder continuo usato in tempo reale, mentre i subtask rendono esplicita la decomposizione di attività di più minuti.
+
+#### Limiti
+
+La generalizzazione rimane circoscritta a task domestici affini al training e soffre in presenza di maniglie insolite, occlusioni e necessità di memoria prolungata. Dataset e checkpoint completi non sono pubblici; inoltre il VLA comanda direttamente braccia e base senza collision avoidance o motion planning, perciò non fornisce da solo garanzie di sicurezza fisica.
+
+L'[approfondimento su $\pi_{0.5}$](models/pi05/README.md) sviluppa fattorizzazione high-level/low-level, architettura ibrida, mixture dei dati, verbal instruction, protocollo sperimentale e ablation.
 
 ### GR00T N1 (2025)
 

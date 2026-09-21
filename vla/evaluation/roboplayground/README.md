@@ -1,28 +1,42 @@
 # RoboPlayground
 
-**RoboPlayground: Democratizing Robotic Evaluation through Structured Physical Domains** mette in discussione un presupposto comune dei benchmark robotici: che task, vincoli e criteri di successo debbano essere fissati una volta per tutte da un piccolo gruppo di esperti. Questa impostazione favorisce la comparabilità, ma restringe lo spazio delle domande che il benchmark può porre e rende costosa ogni estensione, perché una nuova variante richiede di intervenire direttamente sul codice dell'ambiente.
+**RoboPlayground** mette in discussione un presupposto comune dei benchmark robotici: che task, vincoli e criteri di successo debbano essere fissati una volta per tutte da un piccolo gruppo di esperti. Questa impostazione favorisce la comparabilità, ma restringe lo spazio delle domande che il benchmark può porre e rende costosa ogni estensione, perché una nuova variante richiede di intervenire direttamente sul codice dell'ambiente.
 
-RoboPlayground propone una soluzione diversa: usare il linguaggio naturale come **interfaccia di authoring eseguibile** sopra un dominio fisico strutturato. L'utente descrive l'attività e può successivamente modificarne oggetti, relazioni, vincoli o criterio di successo. Il sistema traduce la richiesta in codice MuJoCo, verifica che la scena sia eseguibile e fisicamente coerente e conserva la genealogia delle versioni. Il risultato non è una descrizione libera né un singolo episodio, ma un artefatto condivisibile che definisce una famiglia riproducibile di task.
+RoboPlayground propone una soluzione diversa: usare il **linguaggio naturale** come **interfaccia di authoring eseguibile** sopra un dominio fisico strutturato. 
+
+L'**utente descrive l'attività** e può successivamente modificarne oggetti, relazioni, vincoli o criterio di successo. Il sistema traduce la richiesta in codice MuJoCo, verifica che la scena sia eseguibile e fisicamente coerente e conserva la genealogia delle versioni. Il risultato non è una descrizione libera né un singolo episodio, ma un artefatto condivisibile che definisce una famiglia riproducibile di task.
 
 ![Esempio di trasformazione tra stato iniziale e goal](../figures/roboplayground_task.webp)
 
-*Una specifica linguistica può trasformare la disposizione casuale iniziale in un goal strutturato, in questo caso pile ordinate per colore. Fonte: [sito RoboPlayground](https://roboplayground.github.io/).*
 
 ## Dalla valutazione statica alla valutazione partecipativa
 
-Il lavoro persegue quattro proprietà. **Accessibilità** significa permettere anche a chi non conosce le API del simulatore di esprimere il comportamento da testare. **Crescita continua** indica che lo spazio di valutazione può ampliarsi attraverso contributi successivi. **Riproducibilità** richiede che una specifica possa essere rieseguita su policy diverse. **Controllo strutturato** limita la libertà linguistica affinché variazioni e failure mode restino interpretabili.
+Il lavoro persegue quattro proprietà:
 
-Quest'ultimo punto è essenziale. Un LLM capace di generare arbitrariamente scene e codice può produrre task plausibili nel testo ma ambigui, instabili o impossibili da verificare. RoboPlayground sacrifica parte dell'apertura del mondo in favore di un dominio con asset, relazioni e interfacce note. La democratizzazione riguarda quindi **chi può formulare le prove**, non l'assenza di vincoli sulla loro forma.
+- **Accessibilità** significa permettere anche a chi non conosce le API del simulatore di esprimere il comportamento da testare
+- **Crescita continua** indica che lo spazio di valutazione può ampliarsi attraverso contributi successivi
+- **Riproducibilità** richiede che una specifica possa essere rieseguita su policy diverse
+- **Controllo strutturato** limita la libertà linguistica affinché variazioni e failure mode restino interpretabili
+
+Quest'ultimo punto è essenziale. Un LLM capace di generare arbitrariamente scene e codice può produrre task plausibili nel testo ma ambigui, instabili o impossibili da verificare. 
+
+RoboPlayground sacrifica parte dell'apertura del mondo in favore di un dominio con asset, relazioni e interfacce note. La democratizzazione riguarda quindi **chi può formulare le prove**, non l'assenza di vincoli sulla loro forma.
 
 ## Rappresentazione di un task
 
-Un task viene formalizzato come
+Un task viene formalizzato come segue:
 
 $$
-\mathcal{T}=(\mathcal{A},\rho_0,G,l_{\mathrm{ref}},\mathcal{V}),
+\mathcal{T}=(\mathcal{A},\rho_0,G,l_{\mathrm{ref}},\mathcal{V})
 $$
 
-dove $\mathcal{A}$ è l'insieme degli asset, $\rho_0$ la distribuzione degli stati iniziali, $G:\mathcal{S}\rightarrow\{0,1\}$ il predicato di successo sullo stato del simulatore $s\in\mathcal{S}$, $l_{\mathrm{ref}}$ l'istruzione canonica e $\mathcal{V}$ un insieme di parafrasi per testare la robustezza linguistica. L'istruzione effettivamente fornita alla policy è indicata con $l\in\{l_{\mathrm{ref}}\}\cup\mathcal{V}$; il pedice distingue soltanto la formulazione di riferimento conservata nell'artefatto.
+- $\mathcal{A}$ è l'insieme degli asset
+- $\rho_0$ la distribuzione degli stati iniziali
+- $G:\mathcal{S}\rightarrow\{0,1\}$ il predicato di successo sullo stato  $s\in\mathcal{S}$ del simulatore
+- $l_{\mathrm{ref}}$ l'istruzione canonica
+- $\mathcal{V}$ un insieme di parafrasi per testare la robustezza linguistica
+
+L'istruzione effettivamente fornita alla policy è indicata con $l\in\{l_{\mathrm{ref}}\}\cup\mathcal{V}$
 
 La separazione tra questi componenti risolve un'ambiguità importante. Due frasi semanticamente equivalenti possono produrre valutazioni diverse se cambiano tolleranze, distribuzione di reset o istante in cui si controlla il successo. **Il testo non è quindi, da solo, un'unità sperimentale sufficiente**: l'artefatto deve rendere esplicite anche inizializzazione, asset e logica di verifica.
 
@@ -30,17 +44,23 @@ Ogni implementazione estende una stessa interfaccia e definisce metodi per inizi
 
 ## Dominio fisico ed embodiment
 
-L'istanza presentata nel paper usa **MuJoCo** e un dominio tabletop basato su blocchi. Gli asset includono cubi colorati e cubi semantici con lettere, cifre o simboli visibili, oltre a regioni target. I task comprendono impilamento, ordinamento, allineamento, costruzione di forme, relazioni spaziali, rotazioni e sequenze temporali.
+L'istanza presentata nel paper usa **MuJoCo** e un dominio tabletop basato su blocchi. 
 
-La configurazione è standardizzata: il piano si trova a quota $z=0{,}95\,\mathrm{m}$, gli oggetti vengono collocati entro
+Gli asset includono cubi colorati e cubi semantici con lettere, cifre o simboli visibili, oltre a regioni target. 
+
+I task comprendono impilamento, ordinamento, allineamento, costruzione di forme, relazioni spaziali, rotazioni e sequenze temporali.
+
+La configurazione è standardizzata: il piano si trova a quota $z=0.95\,\mathrm{m}$ e gli oggetti vengono collocati entro i seguenti intervalli:
 
 $$
-x\in[0{,}40,0{,}70]\,\mathrm{m},
+x\in[0.40,0.70]\,\mathrm{m}
 \qquad
-y\in[-0{,}25,0{,}25]\,\mathrm{m},
+y\in[-0.25,0.25]\,\mathrm{m}
 $$
 
-e camera, gravità, attrito e parametri del solver rimangono fissi. La policy controlla un manipolatore simulato mediante azioni cartesiane a sette dimensioni: sei componenti descrivono il delta di posa dell'end-effector e una il gripper. Gli esperimenti non costituiscono una validazione su hardware reale né un confronto cross-embodiment.
+Camera, gravità, attrito e parametri del solver rimangono fissi. La policy controlla un manipolatore simulato mediante azioni cartesiane a sette dimensioni: sei componenti descrivono il delta di posa dell'end-effector e una il gripper. 
+
+Gli esperimenti **non costituiscono una validazione su hardware reale né un confronto cross-embodiment**.
 
 La camera fissa è anche parte della semantica del dominio. Nei task con simboli, una configurazione è corretta solo se le facce rilevanti risultano geometricamente visibili e leggibili. Il sistema usa ray casting verso cinque punti di ogni faccia e la considera visibile quando almeno tre raggi non sono occlusi. Verifica inoltre l'allineamento della normale e l'orientamento nel piano del glifo, evitando che un predicato simbolico accetti lettere rivolte nella direzione sbagliata.
 
@@ -49,8 +69,6 @@ La camera fissa è anche parte della semantica del dominio. Nei task con simboli
 La trasformazione della richiesta in un task eseguibile attraversa quattro blocchi: **orchestrazione**, **generazione del codice**, **validazione con riparazione** e **context steering**. La modularità consente di distinguere gli errori di comprensione dell'intento da quelli sintattici, fisici o relativi allo storico della conversazione.
 
 ![Pipeline di compilazione, steering e validazione di RoboPlayground](../figures/roboplayground_pipeline.webp)
-
-*La descrizione dell'utente viene prima strutturata, poi compilata in codice e infine sottoposta a validatori e agenti di riparazione. Lo steering conserva storia e lineage delle varianti. Fonte: [paper RoboPlayground](https://arxiv.org/abs/2604.05226).*
 
 ### Orchestrazione e schema intermedio
 
@@ -86,13 +104,13 @@ L'hash evita rigenerazioni identiche e identifica cicli nello steering. Soprattu
 
 Lo studio coinvolge **26 partecipanti** in un disegno within-subject: ogni persona usa GenSim, Cursor e RoboPlayground per costruire task equivalenti di strutture tridimensionali con vincoli sui blocchi. Vengono misurati System Usability Scale (SUS), carico NASA-TLX, tempo, tasso di mancato completamento, ranking e preferenza.
 
-RoboPlayground ottiene un SUS medio di 83,4, rispetto a 68,8 per Cursor e 52,5 per GenSim. Il carico medio normalizzato è 18,6, contro 36,7 e 41,8. Il 69% dei partecipanti lo seleziona come sistema preferito, mentre Cursor riceve il 23% e GenSim l'8%. I test non parametrici riportati indicano differenze significative sia nell'usabilità sia nel carico rispetto a entrambe le baseline.
+RoboPlayground ottiene un SUS medio di 83.4, rispetto a 68.8 per Cursor e 52.5 per GenSim. Il carico medio normalizzato è 18.6, contro 36.7 e 41.8. Il 69% dei partecipanti lo seleziona come sistema preferito, mentre Cursor riceve il 23% e GenSim l'8%. I test non parametrici riportati indicano differenze significative sia nell'usabilità sia nel carico rispetto a entrambe le baseline.
 
 Questi risultati sostengono l'accessibilità dell'interfaccia, ma vanno letti nel perimetro dello studio: campione piccolo, ambiente controllato, task sui blocchi e partecipanti con livelli eterogenei ma non rappresentativi dell'intera comunità di utenti finali. La preferenza per l'interfaccia non dimostra inoltre che i task prodotti siano automaticamente più validi dal punto di vista scientifico.
 
 ## Dataset e policy valutate
 
-Per isolare il comportamento delle policy, tutte vengono addestrate sullo stesso insieme di dimostrazioni generate automaticamente con **CuTAMP**. I dieci task di training includono relazioni davanti/dietro e destra/sinistra, impilamenti di due o tre blocchi, allineamento per colore e collocamento su target. Le dimensioni variano da 280 traiettorie per Color Block Alignment a 3.549 per Red on Yellow Stack, per un totale di **24.117 traiettorie**.
+Per isolare il comportamento delle policy, tutte vengono addestrate sullo stesso insieme di dimostrazioni generate automaticamente con **CuTAMP**. I dieci task di training includono relazioni davanti/dietro e destra/sinistra, impilamenti di due o tre blocchi, allineamento per colore e collocamento su target. Le dimensioni variano da 280 traiettorie per Color Block Alignment a 3,549 per Red on Yellow Stack, per un totale di **24,117 traiettorie**.
 
 Le quattro varianti **StarVLA** condividono Qwen3-VL-4B-Instruct e predicono chunk $a_{t:t+15}$ di 16 azioni cartesiane a sette dimensioni. Adapter usa 64 query apprendibili e una testa MLP-ResNet con loss $L_1$; GR00T aggiunge un Diffusion Transformer flow-matching; Dual affianca a quest'ultimo un encoder DINOv2; Qwen-OFT regredisce le azioni dalle posizioni di token speciali secondo l'impostazione OpenVLA-OFT.
 
@@ -124,7 +142,7 @@ La metrica resta tuttavia un proxy. Distanza tra sentence embedding non garantis
 
 ## Ablation della pipeline
 
-Le ablation separano proposta, generazione del codice, validazione e steering. Il risultato più forte riguarda la validazione: senza di essa il successo end-to-end dei task generati scende al 12% nonostante un tasso di compilazione elevato; la validazione testuale lo porta al 96,2% e lo stack completo raggiunge il 100% nel campione di 26 casi.
+Le ablation separano proposta, generazione del codice, validazione e steering. Il risultato più forte riguarda la validazione: senza di essa il successo end-to-end dei task generati scende al 12% nonostante un tasso di compilazione elevato; la validazione testuale lo porta al 96.2% e lo stack completo raggiunge il 100% nel campione di 26 casi.
 
 Inferenza degli asset e controllo di fattibilità migliorano soprattutto la verifica umana. Documentazione delle API, catalogo degli errori ed esempi in-context aumentano robustezza e allineamento senza cambiare molto la compilabilità, già alta. Nello steering, interpretazione dell'intento e storico delle versioni preservano coerenza tra turni; il solo routing privo di storia può invece peggiorare la verifica semantica.
 

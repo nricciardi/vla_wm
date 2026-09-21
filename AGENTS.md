@@ -33,6 +33,7 @@ Questa directory contiene una raccolta strutturata di appunti e conoscenze su Vi
 
 - Usare la notazione numerica anglofona: il punto `.` come separatore decimale e la virgola `,` come separatore delle migliaia. Per esempio, scrivere `3.5`, `10,000` e `10,000.5`, evitando le forme italiane `3,5` e `10.000`.
 - Delimitare sempre il LaTeX inline con `$...$` e quello su riga separata con `$$...$$`; non usare `\(...\)` o `\[...\]`.
+- Non inserire segni di punteggiatura, come virgole o punti finali, alla fine delle formule su riga separata. Riformulare invece il periodo in modo che il testo introduca la formula, preferibilmente con i due punti, e riprendere dopo la formula con una nuova frase autonoma.
 - Usare $o_t$ per l'osservazione, $a_t$ per l'azione e $s_t$ per lo stato, salvo esigenze motivate e dichiarate nel testo.
 - Usare sempre $l$ per rappresentare l'istruzione linguistica, incluse le sezioni dedicate a RT-1 e RT-2.
 - Usare $q_t$ per lo stato del robot e $q$ per la configurazione articolare, con $\dot q$ e $\ddot q$ per velocità e accelerazione articolare. Quando è utile evidenziarne la natura vettoriale, usare $\mathbf{q}_t$ mantenendo invariato il simbolo di base.
