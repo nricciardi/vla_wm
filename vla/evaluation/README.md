@@ -4,23 +4,15 @@
 
 ### RoboEval
 
-**RoboEval** valuta policy di manipolazione bimanuale affiancando al successo binario una descrizione strutturata della qualità dell'esecuzione. La prima release comprende otto task simulati, da operazioni brevi come sollevare un recipiente o ruotare una valvola fino ad attività multistadio come riporre un libro o chiudere una scatola. Ogni task presenta variazioni controllate di posizione e orientamento e dispone di dimostrazioni raccolte tramite teleoperazione in realtà virtuale.
+**RoboEval** valuta policy di manipolazione bimanuale affiancando al successo binario una **descrizione strutturata della qualità dell'esecuzione**.
+
+La prima release comprende **8 task simulati**, da operazioni brevi come sollevare un recipiente o ruotare una valvola fino ad attività multistadio come riporre un libro o chiudere una scatola. Ogni task presenta **variazioni controllate di posizione e orientamento** e dispone di dimostrazioni raccolte tramite teleoperazione in realtà virtuale.
+
+Il punto centrale è che due policy con lo stesso *success rate* possono produrre movimenti molto diversi. RoboEval registra quindi lunghezza e durata della traiettoria, jerk, collisioni, slip, coordinazione dei bracci e progressione attraverso gli stadi del task.
+
+Il benchmark usa un **solo setup bimanuale simulato** e varia soprattutto la posa degli oggetti; non stabilisce quindi che le stesse metriche mantengano identico significato su hardware reale o in domini fisici differenti. L'[approfondimento su RoboEval](roboeval/README.md) discute task, dataset, formalizzazione delle metriche e risultati sperimentali.
 
 ![Panoramica dei task e delle metriche di RoboEval](figures/roboeval_overview.webp)
-
-*RoboEval collega task bimanuali a metriche di efficienza, sicurezza, stabilità, coordinazione e avanzamento.*
-
-Il punto centrale è che due policy con lo stesso *success rate* possono produrre movimenti molto diversi. RoboEval registra quindi lunghezza e durata della traiettoria, jerk, collisioni, slip, coordinazione dei bracci e progressione attraverso gli stadi del task. L'interfaccia seguente è pseudocodice e ne mostra l'idea essenziale:
-
-```python
-report = evaluator.run(policy, task="LiftTray", variation="position")
-
-print(report.success_rate)
-print(report.task_progression)
-print(report.cartesian_jerk, report.self_collisions)
-```
-
-Il benchmark usa un solo setup bimanuale simulato e varia soprattutto la posa degli oggetti; non stabilisce quindi che le stesse metriche mantengano identico significato su hardware reale o in domini fisici differenti. L'[approfondimento su RoboEval](roboeval/README.md) discute task, dataset, formalizzazione delle metriche e risultati sperimentali.
 
 ### RoboPlayground
 
