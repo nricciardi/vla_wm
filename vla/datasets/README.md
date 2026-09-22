@@ -173,3 +173,21 @@ I video **egocentrici**, acquisiti da una camera indossata dalla persona, avvici
 Queste proprietà favoriscono grounding linguistico, riconoscimento delle affordance e apprendimento di struttura procedurale. Persistono tuttavia l'assenza di comandi robotici e un embodiment gap: mani umane, camera sulla testa e controllo dello sguardo non coincidono con gripper e camere di un robot. Le risorse ufficiali di [Ego4D](https://ego4d-data.org/docs/), [EPIC-KITCHENS](https://epic-kitchens.github.io/), [Ego-Exo4D](https://docs.ego-exo4d-data.org/) e [HoloAssist](https://holoassist.github.io/) permettono di verificare modalità e licenze.
 
 La scelta tra queste sorgenti dipende quindi dal livello di supervisione richiesto. **ALOHA** fornisce azioni direttamente eseguibili su una piattaforma bimanuale; i dataset umanoidi richiedono spesso retargeting; i video umani ed egocentrici sono soprattutto dati di pre-training percettivo, semantico e dinamico. Combinarli è promettente, purché il passaggio tra questi livelli non venga presentato come una semplice concatenazione di dataset.
+
+## Curation, deduplicazione e split semantici
+
+La qualità di un dataset non dipende soltanto dalla raccolta. È necessario anche decidere **quali esempi siano duplicati, quale unità debba rimanere indivisibile e quali differenze debbano separare training, validation e test**. Nei video e nelle traiettorie robotiche, uno split casuale per frame può collocare osservazioni consecutive in partizioni diverse e produrre semantic leakage: il test contiene allora immagini quasi identiche a quelle usate per il training.
+
+### BubbleFence
+
+**BubbleFence** affronta questo problema rappresentando le immagini con un vision foundation model e costruendo lo split direttamente nello spazio degli embedding. La configurazione predefinita usa CLIP, elimina quasi duplicati mediante similarità coseno e colloca anchor tramite sequenze Quasi-Monte Carlo. Attorno a ogni anchor definisce una bubble con raggio adattato alla Local Intrinsic Dimensionality: i punti esterni rimangono nel training set, mentre due shell concentriche formano validation e test.
+
+La pipeline è progettata per dati incrementali. Anchor, embedding e assegnazioni persistono tra round di ingestione; i nuovi esempi riusano le bubble esistenti e ne creano altre soltanto quando serve a mantenere la quota di evaluation. L'articolo dimostra il comportamento su **Zenseact Open Dataset Drives** e su frame Minecraft derivati da **Video PreTraining**, non su robot o dataset VLA. Non presenta inoltre un confronto downstream che dimostri prestazioni di generalizzazione stimate meglio rispetto alle baseline.
+
+#### Novelty
+
+Il contributo consiste nel combinare **semantic fencing, placement QMC, densità locale, controllo closed-loop dello split e persistenza streaming**. In questo modo la partizione segue regioni di similarità visuale e può crescere senza ricalcolare interamente i batch precedenti.
+
+#### Limiti
+
+La semantica dello split dipende dall'encoder e non comprende automaticamente istruzione, azione, stato robotico o appartenenza allo stesso episodio. Per dati VLA è quindi necessario applicare vincoli di gruppo a livello di rollout e integrare il criterio visuale con task, ambiente, embodiment e sessione. L'[approfondimento su BubbleFence](bubblefence/README.md) ricostruisce formalizzazione, placement degli anchor, raggi adattivi, ingestione incrementale, risultati dimostrativi e limiti per il robot learning.

@@ -537,6 +537,10 @@ Alcuni dati sono preziosi proprio perché restringono il problema. I dataset **A
 
 L'[approfondimento sui dataset per VLA](datasets/README.md#dataset-più-specifici) descrive queste sorgenti e il modo in cui possono integrare, senza sostituirle direttamente, le traiettorie robotiche.
 
+### Curation e split semantici
+
+La raccolta non determina da sola la validità di un dataset: deduplicazione e split devono impedire che frame consecutivi o scene quasi identiche compaiano sia nel training sia nel test. **BubbleFence** usa embedding visuali, bubble adattive e anchor persistenti per costruire partizioni semantiche su flussi incrementali. Il metodo è stato mostrato su guida autonoma e gameplay, non ancora validato su traiettorie robotiche; nei VLA va quindi combinato con split per episodio, task, ambiente ed embodiment. L'[overview sulla curation](datasets/README.md#curation-deduplicazione-e-split-semantici) e l'[approfondimento su BubbleFence](datasets/bubblefence/README.md) ne discutono algoritmo e limiti.
+
 
 ## Evaluation per VLA
 
