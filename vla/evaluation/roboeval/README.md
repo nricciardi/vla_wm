@@ -54,8 +54,7 @@ Per ciascun task gli autori traducono l'obiettivo semantico in un predicato dete
 La forma generale è:
 
 $$
-\mathcal{S}_{\mathrm{success}}
-=
+\mathcal{S}_{\mathrm{success}} =
 \left\{s\in\mathcal{S}\mid C_1(s)\land C_2(s)\land\cdots\land C_K(s)\right\}
 $$
 
@@ -71,8 +70,7 @@ La condizione di successo viene valutata usando pose, contatti e stati dei giunt
 Il **success rate** su $M$ rollout è pertanto:
 
 $$
-\mathrm{SR}
-=
+\mathrm{SR}=
 \frac{1}{M}
 \sum_{i=1}^{M}
 \mathbb{1}\!\left[s_{T_i}^{(i)}\in\mathcal{S}_{\mathrm{success}}\right]
@@ -83,8 +81,7 @@ In questa espressione, $T_i$ è l'istante terminale dell'episodio $i$ e $\mathbb
 Gli **stadi di progressione** sono distinti da $\mathcal{S}_{\mathrm{success}}$. Ogni ambiente mantiene flag binari che diventano veri quando viene raggiunto un sotto-obiettivo, come afferrare, sollevare o stabilire il contatto corretto. I flag restano registrati anche se in seguito la policy perde l'oggetto. Se un task ha $K$ stadi, la progressione dell'episodio è:
 
 $$
-P_{\mathrm{task}}
-=
+P_{\mathrm{task}}=
 \frac{1}{K}
 \sum_{k=1}^{K} b_k
 $$
@@ -94,8 +91,7 @@ In questa espressione, $b_k\in\{0,1\}$ indica se lo stadio $k$ è stato raggiunt
 Il dataset associato a un task può essere scritto come:
 
 $$
-\mathcal{D}_{\mathcal{T}}
-=
+\mathcal{D}_{\mathcal{T}}=
 \left\{(s_0,a_0,\ldots,s_T)^{(i)}\right\}_{i=1}^{N}
 $$
 
@@ -221,6 +217,8 @@ La progressione per valvola localizza immediatamente una soluzione incompleta. L
 
 **Esempio.** Se la policy ruota la prima valvola oltre soglia ma non raggiunge la seconda, completa due stadi su quattro e ottiene $P_{\mathrm{task}}=0.5$. Se entrambe superano la soglia il rollout è riuscito, ma ripetute riprese della presa compaiono come percorso più lungo, jerk più elevato e possibili slip.
 
+---
+
 Gli otto task richiedono quindi combinazioni differenti di presa, trasferimento, rotazione e coordinazione. Gli esempi mostrano perché RoboEval non ordina le policy con una singola somma pesata: **lo stesso valore numerico può avere significati diversi in task simmetrici, asimmetrici o sequenziali**.
 
 I task coprono contesti tabletop, di servizio e industriali e sono eseguiti con un **embodiment simulato formato da due bracci Franka Panda con gripper paralleli**. Lo spazio di controllo continuo supporta target articolari e pose degli end-effector, in forma assoluta o incrementale. Il benchmark valuta questo setup in MuJoCo e non presenta esperimenti equivalenti su hardware reale: i risultati descrivono quindi l'embodiment bimanuale simulato, non il comportamento fisico dei Panda.
@@ -237,7 +235,7 @@ Lift Tray, Stack Two Cubes, Rod Handover, Lift Pot, Pack Box e Pick Book From Ta
 Ogni task dispone quindi di tre o quattro livelli di variazione spaziale che preservano la semantica dell'attività.
 
 
-![Gli otto task bimanuali di RoboEval](../figures/roboeval_tasks.webp)
+![Gli otto task bimanuali di RoboEval](figures/task_overview.png)
 
 ## Dataset di dimostrazioni
 
@@ -279,13 +277,11 @@ L'**efficienza spaziale** viene misurata mediante la **lunghezza cumulativa del 
 Indicando con $q_t$ la configurazione articolare e con $x_t\in\mathbb{R}^3$ la posizione cartesiana dell'end-effector al tempo $t$, le prime due grandezze sono:
 
 $$
-L_{\mathrm{joint}}
-=
+L_{\mathrm{joint}}=
 \sum_{t=1}^{T-1}
 \left\|q_{t+1}-q_t\right\|_2
 \qquad
-L_{\mathrm{cart}}
-=
+L_{\mathrm{cart}}=
 \sum_{t=1}^{T-1}
 \left\|x_{t+1}-x_t\right\|_2
 $$
@@ -299,8 +295,7 @@ La fluidità viene caratterizzata tramite il **jerk**, cioè la derivata terza d
 Per la traiettoria cartesiana:
 
 $$
-J_{\mathrm{cart}}
-=
+J_{\mathrm{cart}}=
 \frac{1}{T-3}
 \sum_{t=1}^{T-3}
 \left\|
@@ -323,8 +318,7 @@ Per misurare l'accoppiamento spaziale, il benchmark calcola la discrepanza verti
 Se $x_t^{(L)},x_t^{(R)}\in\mathbb{R}^3$ sono le rispettive posizioni, la discrepanza verticale $\Delta z$ è definita come segue:
 
 $$
-\Delta z
-=
+\Delta z=
 \frac{1}{T}
 \sum_{t=1}^{T}
 \left|x_t^{(L)}[z]-x_t^{(R)}[z]\right|
@@ -343,8 +337,7 @@ $$
 La divergenza media delle velocità si ottiene quindi come segue:
 
 $$
-\Delta v
-=
+\Delta v=
 \frac{1}{T-1}
 \sum_{t=1}^{T-1}
 \left\|v_t^{(L)}-v_t^{(R)}\right\|_2

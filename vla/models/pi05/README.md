@@ -1,14 +1,16 @@
 # $\pi_{0.5}$
 
-**$\pi_{0.5}$** estende $\pi_0$ con un obiettivo diverso dalla sola acquisizione di skill motorie: portare un VLA fuori dal laboratorio e verificare se possa operare in **case mai osservate durante il training**, tra layout, oggetti e configurazioni visive nuove. Il lavoro non attribuisce questa capacità a un singolo aumento di scala, ma a una ricetta di **co-training eterogeneo** che combina azioni di robot diversi, annotazioni semantiche, istruzioni verbali e dati multimodali provenienti dal web.
+**$\pi_{0.5}$** estende $\pi_0$ con un obiettivo diverso dalla sola acquisizione di skill motorie: portare un VLA fuori dal laboratorio e verificare se possa operare in **case mai osservate durante il training**, tra layout, oggetti e configurazioni visive nuove. 
 
-Il sistema è presentato nel paper [$\pi_{0.5}$: a Vision-Language-Action Model with Open-World Generalization](https://arxiv.org/abs/2504.16054). Il target sperimentale principale è la manipolazione domestica mobile: il robot deve riordinare cucine e camere da letto, aprire cassetti, spostare stoviglie, raccogliere indumenti e sistemare letti senza disporre di una mappa o di un motion planner esterno.
+Il lavoro non attribuisce questa capacità a un singolo aumento di scala, ma a una ricetta di **co-training eterogeneo** che combina azioni di robot diversi, annotazioni semantiche, istruzioni verbali e dati multimodali provenienti dal web.
+
+Il target sperimentale principale è la manipolazione domestica mobile: il robot deve riordinare cucine e camere da letto, aprire cassetti, spostare stoviglie, raccogliere indumenti e sistemare letti senza disporre di una mappa o di un motion planner esterno.
 
 ## Da $\pi_0$ a una policy gerarchica
 
-$\pi_0$ collega un VLM a un **action expert** che genera chunk di azioni continue tramite flow matching. Questa struttura produce controllo destro ad alta frequenza, ma il comando linguistico globale viene trasformato direttamente in movimento. Per task di pochi secondi questa formulazione può essere sufficiente; per attività che durano minuti diventa invece necessario decidere ripetutamente **quale subtask eseguire**.
+$\pi_0$ collega un VLM a un *action expert* che genera chunk di azioni continue tramite flow matching. Questa struttura produce controllo destro ad alta frequenza, ma il comando linguistico globale viene trasformato direttamente in movimento. Per task di pochi secondi questa formulazione può essere sufficiente; per attività che durano minuti diventa invece necessario decidere ripetutamente **quale subtask eseguire**.
 
-$\pi_{0.5}$ introduce un livello semantico esplicito. Data l'istruzione globale $l$, il modello osserva le immagini $o_t$ e lo stato del robot $q_t$, quindi produce un subtask testuale $\hat l_t$, come “raccogli il piatto”. L'action expert genera successivamente un chunk continuo condizionato da quel subtask:
+$\pi_{0.5}$ introduce un **livello semantico esplicito**. Data l'istruzione globale $l$, il modello osserva le immagini $o_t$ e lo stato del robot $q_t$, quindi produce un subtask testuale $\hat l_t$, come "raccogli il piatto". L'action expert genera successivamente un **chunk continuo condizionato da quel subtask**:
 
 $$
 A_t=[a_t,a_{t+1},\ldots,a_{t+H-1}]
@@ -27,7 +29,6 @@ Il primo fattore descrive il **controllo low-level**, mentre il secondo rapprese
 
 ![Pre-training, post-training e inferenza gerarchica di pi 0.5](figures/pi05_training_and_inference.png)
 
-*Il pre-training discreto, l'aggiunta dell'action expert e l'inferenza high-level/low-level. Fonte: paper “$\pi_{0.5}$: a Vision-Language-Action Model with Open-World Generalization”, Figura 3.*
 
 ## Architettura multimodale
 
@@ -35,13 +36,13 @@ Il backbone conserva l'impostazione PaliGemma di $\pi_0$: un encoder visuale **S
 
 Gli input possono appartenere a tre famiglie. Le immagini vengono suddivise in patch e codificate dall'encoder visuale; testo e stato propriocettivo discretizzato diventano token; le azioni rumorose utilizzate dal flow matching sono proiettate nello spazio degli embedding mediante un layer lineare. I pesi dell'action expert elaborano questi ultimi token, ma condividono i layer di attenzione con il backbone vision-language.
 
-Una maschera di attenzione impedisce che le due rappresentazioni delle azioni si contaminino. I token FAST autoregressivi vedono il prefisso multimodale e i token FAST precedenti; i token continui dell'action expert vedono il prefisso e l'intero chunk rumoroso, ma **non i token FAST**. L'informazione fluisce dal VLM verso l'action expert, non nella direzione opposta.
+Una **maschera di attenzione** impedisce che le due rappresentazioni delle azioni si contaminino. I token FAST autoregressivi vedono il prefisso multimodale e i token FAST precedenti; i token continui dell'action expert vedono il prefisso e l'intero chunk rumoroso, ma *non i token FAST*. Quindi **l'informazione fluisce dal VLM verso l'action expert, non nella direzione opposta**.
 
 Rispetto a $\pi_0$, il timestep generativo $\tau$ non viene concatenato direttamente all'azione rumorosa. Un MLP lo proietta separatamente e lo inietta in ogni layer dell'action expert tramite **adaptive RMSNorm**. Questa modifica mantiene distinto il segnale temporale del processo di flow matching dalla rappresentazione del comando motorio.
 
 ## Azioni discrete per il training, continue per il controllo
 
-La scelta progettuale più caratteristica consiste nell'utilizzare **due rappresentazioni compatibili della stessa traiettoria**. Durante il pre-training le azioni vengono compresse dal tokenizer FAST e predette autoregressivamente come token discreti. Questa interfaccia permette di trattare con la stessa cross-entropy risposte testuali, bounding box, subtask e sequenze robotiche.
+La scelta progettuale più caratteristica consiste nell'utilizzare **due rappresentazioni compatibili della stessa traiettoria**. Durante il pre-training le azioni vengono compresse dal tokenizer FAST e **predette autoregressivamente come token discreti**. Questa interfaccia permette di trattare con la stessa cross-entropy risposte testuali, bounding box, subtask e sequenze robotiche.
 
 Nel post-training viene aggiunto l'action expert continuo. Dato il chunk dimostrato $A_t$, si campionano rumore gaussiano $\omega\sim\mathcal{N}(0,I)$ e un tempo $\tau\in[0,1]$, quindi si costruisce l'interpolazione:
 
@@ -49,7 +50,9 @@ $$
 A_t^{\tau,\omega}=\tau A_t+(1-\tau)\omega
 $$
 
-L'action expert $v_\theta$ apprende un campo che trasporta il rumore verso il chunk di azioni. Con la convenzione temporale adottata dal paper, il target può essere scritto come $\omega-A_t$. La loss complessiva combina quindi next-token prediction e flow matching:
+L'action expert $v_\theta$ apprende un campo che trasporta il rumore verso il chunk di azioni. 
+
+Il target può essere scritto come $\omega-A_t$. La loss complessiva combina quindi next-token prediction e flow matching:
 
 $$
 \mathcal{L}(\theta)
@@ -72,8 +75,6 @@ In inferenza il testo $\hat l_t$ viene decodificato autoregressivamente. Il chun
 La generalizzazione non viene cercata raccogliendo soltanto più episodi sul robot target. Il mixture separa fonti con ruoli differenti e le porta in un'interfaccia multimodale comune.
 
 ![Esempi delle sorgenti impiegate nel pre-training e nel post-training di pi 0.5](figures/pi05_data_mixture.png)
-
-*Esempi di robot data, supervisioni high-level, web data e verbal instruction. Fonte: paper “$\pi_{0.5}$: a Vision-Language-Action Model with Open-World Generalization”, Figura 4.*
 
 ### Mobile manipulator in ambienti diversi
 
@@ -151,8 +152,8 @@ Infine, la policy integra pianificazione semantica e controllo nella stessa rete
 
 “Open-world” descrive la generalizzazione a **nuove case all'interno di un dominio domestico preparato**, non un robot capace di operare senza vincoli in qualsiasi ambiente. I task, i tipi di mobili, gli action space e le famiglie di comportamento rimangono legati alla distribuzione di training; oggetti con maniglie insolite o meccanismi fisicamente difficili causano ancora fallimenti persistenti.
 
-La policy dispone di **contesto e memoria limitati**. Occlusioni create dal braccio possono far perdere un oggetto o una macchia, mentre il livello high-level può ripetere subtask già completati, come aprire e chiudere più volte lo stesso cassetto. Attività tra stanze o che richiedono ricordare dove sia stato riposto un oggetto non sono dimostrate in modo sistematico.
+La policy dispone di **contesto e memoria limitati**. Occlusioni create dal braccio possono far perdere un oggetto o una macchia, mentre **il livello high-level può ripetere subtask già completati**, come aprire e chiudere più volte lo stesso cassetto. Attività tra stanze o che richiedono ricordare dove sia stato riposto un oggetto non sono dimostrate in modo sistematico.
 
-La raccolta è in gran parte proprietaria e il paper non pubblica checkpoint, dataset completo e pipeline sufficienti a replicare il risultato. Le ablation isolano alcune componenti del mixture, ma non permettono di stimare con precisione il contributo della qualità delle dimostrazioni, della scala computazionale o di tutte le scelte di filtraggio.
+La **raccolta è in gran parte proprietaria e il paper non pubblica checkpoint**, dataset completo e pipeline sufficienti a replicare il risultato. Le ablation isolano alcune componenti del mixture, ma non permettono di stimare con precisione il contributo della qualità delle dimostrazioni, della scala computazionale o di tutte le scelte di filtraggio.
 
-Il modello non include collision avoidance e motion planning espliciti. Affidare direttamente al VLA target di braccia e base rende il sistema reattivo, ma lascia aperti robustezza, verifica dei vincoli e sicurezza funzionale. Il language-level reasoning migliora la decomposizione del task, senza fornire garanzie sulla correttezza del piano o sull'esecuzione fisica.
+Il modello **non include collision avoidance e motion planning espliciti**. Affidare direttamente al VLA target di braccia e base rende il sistema reattivo, ma lascia aperti robustezza, verifica dei vincoli e sicurezza funzionale. Il language-level reasoning migliora la decomposizione del task, senza fornire garanzie sulla correttezza del piano o sull'esecuzione fisica.

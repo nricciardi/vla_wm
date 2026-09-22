@@ -160,10 +160,8 @@ Il dominio sperimentale è intenzionalmente ristretto a blocchi rigidi, camera f
 
 La verifica del goal parte da una configurazione finale campionata e ne controlla la stabilità, ma **goal stabile non significa goal raggiungibile** dalla distribuzione iniziale con il robot disponibile. Un task può superare compilazione, smoke test e success check pur richiedendo una traiettoria impraticabile o una precisione non realistica.
 
-L'allineamento semantico non è completamente automatico. La verifica umana è costosa, mentre un LLM usato come giudice può condividere errori e bias con il generatore. Le soglie geometriche, gli esempi recuperati e le classi di steering incorporano inoltre decisioni degli autori che limitano ciò che gli utenti possono esprimere.
+L'**allineamento semantico non è completamente automatico**. La verifica umana è costosa, mentre un **LLM usato come giudice può condividere errori e bias con il generatore**. Le soglie geometriche, gli esempi recuperati e le classi di steering incorporano inoltre decisioni degli autori che limitano ciò che gli utenti possono esprimere.
 
 Lo studio di usabilità coinvolge 26 persone e due esercizi centrati su strutture di blocchi; non stabilisce ancora come l'interfaccia si comporti con utenti di domini industriali o task molto più lunghi. Analogamente, la misura di diversità basata sul testo non equivale a copertura fisica o comportamentale.
 
 Infine, la valutazione delle policy usa dimostrazioni sintetiche CuTAMP e un unico action space cartesiano. I risultati diagnosticano bene le perturbazioni costruite nel playground, ma non provano trasferimento su hardware, generalizzazione cross-embodiment o robustezza a distribuzioni percettive realistiche.
-
-Il riferimento primario è il [paper RoboPlayground](https://arxiv.org/abs/2604.05226); il [sito del progetto](https://roboplayground.github.io/) raccoglie l'interfaccia e le risorse collegate.
