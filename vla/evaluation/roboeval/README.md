@@ -55,7 +55,7 @@ La forma generale è:
 
 $$
 \mathcal{S}_{\mathrm{success}} =
-\left\{s\in\mathcal{S}\mid C_1(s)\land C_2(s)\land\cdots\land C_K(s)\right\}
+\{s\in\mathcal{S}\mid C_1(s)\land C_2(s)\land\cdots\land C_K(s)\}
 $$
 
 In questa definizione, ciascuna $C_k$ verifica una relazione fisicamente significativa: contatto tra due oggetti, assenza di contatto con il supporto, presa da parte di uno o di entrambi i gripper, superamento di una quota, orientamento entro una tolleranza oppure posizione di un giunto entro un intervallo.
@@ -73,7 +73,7 @@ $$
 \mathrm{SR}=
 \frac{1}{M}
 \sum_{i=1}^{M}
-\mathbb{1}\!\left[s_{T_i}^{(i)}\in\mathcal{S}_{\mathrm{success}}\right]
+\mathbb{1}\![s_{T_i}^{(i)}\in\mathcal{S}_{\mathrm{success}}]
 $$
 
 In questa espressione, $T_i$ è l'istante terminale dell'episodio $i$ e $\mathbb{1}[\cdot]$ vale $1$ quando il predicato è vero. La logica è intenzionalmente più severa del semplice raggiungimento di una posizione: per esempio, un cubo appoggiato sull'altro ma ancora trattenuto non costituisce un impilamento completato.
@@ -92,7 +92,7 @@ Il dataset associato a un task può essere scritto come:
 
 $$
 \mathcal{D}_{\mathcal{T}}=
-\left\{(s_0,a_0,\ldots,s_T)^{(i)}\right\}_{i=1}^{N}
+\{(s_0,a_0,\ldots,s_T)^{(i)}\}_{i=1}^{N}
 $$
 
 In questa definizione, $N$ è il numero di dimostrazioni e $T$ può variare tra episodi.
@@ -279,11 +279,11 @@ Indicando con $q_t$ la configurazione articolare e con $x_t\in\mathbb{R}^3$ la p
 $$
 L_{\mathrm{joint}}=
 \sum_{t=1}^{T-1}
-\left\|q_{t+1}-q_t\right\|_2
+\|q_{t+1}-q_t\|_2
 \qquad
 L_{\mathrm{cart}}=
 \sum_{t=1}^{T-1}
-\left\|x_{t+1}-x_t\right\|_2
+\|x_{t+1}-x_t\|_2
 $$
 
 Una quantità minore indica un** percorso più diretto, ma soltanto a parità di task e di esito**. Una traiettoria breve che interrompe precocemente il tentativo non è preferibile a una traiettoria più lunga che completa l'attività. Per questo le metriche di efficienza devono essere lette insieme a progressione e successo.
@@ -298,9 +298,9 @@ $$
 J_{\mathrm{cart}}=
 \frac{1}{T-3}
 \sum_{t=1}^{T-3}
-\left\|
+\|
 \frac{x_{t+3}-3x_{t+2}+3x_{t+1}-x_t}{(\Delta t)^3}
-\right\|_2
+\|_2
 $$
 
 In questa espressione, $\Delta t$ è l'intervallo di controllo.
@@ -321,7 +321,7 @@ $$
 \Delta z=
 \frac{1}{T}
 \sum_{t=1}^{T}
-\left|x_t^{(L)}[z]-x_t^{(R)}[z]\right|
+|x_t^{(L)}[z]-x_t^{(R)}[z]|
 $$
 
 Per l'accoppiamento temporale considera invece la divergenza delle velocità.
@@ -340,7 +340,7 @@ $$
 \Delta v=
 \frac{1}{T-1}
 \sum_{t=1}^{T-1}
-\left\|v_t^{(L)}-v_t^{(R)}\right\|_2
+\|v_t^{(L)}-v_t^{(R)}\|_2
 $$
 
 Valori ridotti di $\Delta z$ e $\Delta v$ indicano rispettivamente maggiore allineamento verticale e maggiore sincronizzazione delle velocità.
