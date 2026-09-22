@@ -107,9 +107,7 @@ La prima release comprende **otto task di manipolazione bimanuale**. Tutti regis
 
 La policy deve raggiungere i due lati di un vassoio, afferrarlo con entrambi i gripper e separarlo dal tavolo. È un task di **coordinazione stretta e simmetrica**: una differenza di quota o velocità tra le mani tende a inclinare il vassoio e a destabilizzare le prese.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/lift_tray.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Lift Tray](media/lift_tray.gif)](media/lift_tray.mp4)
 
 
 Uno stato appartiene a $\mathcal{S}_{\mathrm{success}}$ quando entrambi i gripper trattengono il vassoio e questo non è più in contatto con il tavolo. I tre stadi verificano, nell'ordine logico, presa sinistra, presa destra e sollevamento bimanuale senza contatto con tavolo o pavimento.
@@ -122,9 +120,7 @@ Oltre a successo e progressione, **differenza verticale $\Delta z$ e divergenza 
 
 Il task richiede di manipolare entrambi i cubi e produrre una pila stabile sul tavolo. La coordinazione è **lasca**: i bracci possono operare in momenti differenti, purché realizzino la relazione geometrica finale.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/stack_cubes.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Stack Two Cubes](media/stack_cubes.gif)](media/stack_cubes.mp4)
 
 Il successo richiede che il cubo inferiore tocchi il tavolo, quello superiore tocchi il cubo inferiore senza toccare direttamente il tavolo e nessun cubo sia ancora trattenuto da un gripper. Gli stadi registrano la presa di un primo cubo, la successiva presa dell'altro e la configurazione impilata.
 
@@ -136,9 +132,7 @@ La progressione separa quindi i problemi di presa da quelli di posa. Le distanze
 
 Questo è il task con l'orizzonte medio più lungo. Il robot deve afferrare il libro sul piano, sollevarlo, trasportarlo verso lo scaffale, inserirlo fino al contatto con un ripiano e rilasciarlo. La difficoltà deriva dalla sequenza **presa–trasporto–allineamento–rilascio** e dallo spazio ristretto vicino allo scaffale.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/stack_single_book.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Stack Single Book Shelf](media/stack_single_book.gif)](media/stack_single_book.mp4)
 
 Lo stato finale è valido quando il libro tocca il ripiano superiore o inferiore e non è più trattenuto da alcun gripper. I quattro stadi sono presa, sollevamento di almeno $0.1$ m rispetto alla quota iniziale, contatto con un ripiano e rilascio sul ripiano.
 
@@ -150,9 +144,7 @@ Successo e progressione indicano fino a quale fase è arrivata la policy; distan
 
 La policy deve prendere un oggetto allungato con un braccio e trasferirlo all'altro senza farlo cadere. Il task isola la **sovrapposizione temporale delle prese** e la capacità di cedere il controllo dell'oggetto.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/lift_bar.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Rod Handover](media/lift_bar.gif)](media/lift_bar.mp4)
 
 L'ambiente identifica quale gripper stabilisce per primo la presa. Il successo si verifica quando il gripper opposto trattiene l'oggetto e quello iniziale lo ha rilasciato. I due stadi registrano l'esistenza di una prima presa e l'avvenuto trasferimento al lato opposto; la caduta sul pavimento termina il tentativo come fallimento.
 
@@ -164,9 +156,7 @@ Slip count e distanze dell'oggetto dai due gripper sono le misure più direttame
 
 Il robot deve afferrare le due maniglie di un recipiente e sollevarlo mantenendolo sufficientemente diritto. È, insieme a Lift Tray, un task di **coordinazione bimanuale stretta**, ma aggiunge un vincolo esplicito sull'orientamento dell'oggetto.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/lift_pot.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Lift Pot](media/lift_pot.gif)](media/lift_pot.mp4)
 
 
 Il recipiente deve trovarsi almeno $0.1$ m sopra la quota iniziale, non deve toccare i due mobili di supporto e il suo asse verticale deve rimanere entro una tolleranza di $20^\circ$ dalla postura ammessa, senza capovolgersi. Gli stadi registrano separatamente presa sinistra, presa destra, superamento della quota e sollevamento bimanuale con orientamento valido.
@@ -179,9 +169,7 @@ La valutazione include errore di posa, distanza di sollevamento e distanze tra g
 
 La scena contiene una scatola con due falde inizialmente aperte. I bracci devono interagire con le falde e portare entrambi i relativi giunti nella configurazione chiusa. Non è necessario imporre una sincronizzazione simmetrica: le due falde possono essere chiuse in sequenza.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/pack_box.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Pack Box](media/pack_box.gif)](media/pack_box.mp4)
 
 Lo stato è di successo quando i due valori articolari della scatola sono entrambi prossimi a zero con tolleranza assoluta $0.1$. I cinque stadi sono presa della falda sinistra, presa della falda destra, chiusura della falda destra, chiusura della falda sinistra e chiusura simultanea dell'intera scatola.
 
@@ -193,9 +181,7 @@ La progressione individua quale falda causa il fallimento e le distanze gripper-
 
 La policy deve afferrare un libro e staccarlo dal piano, mantenendone il controllo. È un task più breve di Stack Single Book Shelf e isola principalmente **raggiungimento, presa e sollevamento**.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/lift_single_book.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Pick Book From Table](media/lift_single_book.gif)](media/lift_single_book.mp4)
 
 Il successo richiede che almeno un gripper trattenga il libro, che la sua quota sia almeno $0.77$ m e che il libro non tocchi né il piano di appoggio né il pavimento. I due stadi sono presa e sollevamento con distacco dai supporti.
 
@@ -207,9 +193,7 @@ Le distanze libro-gripper e la quota di sollevamento permettono di distinguere m
 
 Il task presenta due valvole che devono essere ruotate oltre una soglia. Richiede presa o contatto efficace, generazione di moto attorno a un asse e passaggio da una valvola all'altra; i due bracci possono agire indipendentemente.
 
-<video controls playsinline preload="metadata" width="100%">
-  <source src="media/rotate_valve.mp4" type="video/mp4">
-</video>
+[![Dimostrazione del task Rotate Valve](media/rotate_valve.gif)](media/rotate_valve.mp4)
 
 Il successo è dichiarato quando lo stato di ciascuna valvola supera $0.10$ nella direzione prevista. I quattro stadi registrano presa della prima valvola, superamento della soglia per la prima, presa della seconda e superamento della soglia per la seconda.
 
