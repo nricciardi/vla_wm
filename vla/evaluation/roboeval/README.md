@@ -25,7 +25,7 @@ L'estensibilità è ottenuta **separando definizione del task, generazione delle
 Un task è rappresentato dalla tupla:
 
 $$
-\mathcal{T}=(\mathcal{S},\mathcal{A},P,\mathcal{G},\rho_0,\mathcal{S}_{\mathrm{success}})
+\mathcal{T} = (\mathcal{S},\mathcal{A},P,\mathcal{G},\rho_0,\mathcal{S}_{\mathrm{success}})
 $$
 
 - $\mathcal{S}$ è lo spazio degli stati, comprendente configurazione del robot, pose degli oggetti e contesto ambientale
@@ -70,7 +70,7 @@ La condizione di successo viene valutata usando pose, contatti e stati dei giunt
 Il **success rate** su $M$ rollout è pertanto:
 
 $$
-\mathrm{SR}=
+\mathrm{SR} =
 \frac{1}{M}
 \sum_{i=1}^{M}
 \mathbb{1}\![s_{T_i}^{(i)}\in\mathcal{S}_{\mathrm{success}}]
@@ -81,7 +81,7 @@ In questa espressione, $T_i$ è l'istante terminale dell'episodio $i$ e $\mathbb
 Gli **stadi di progressione** sono distinti da $\mathcal{S}_{\mathrm{success}}$. Ogni ambiente mantiene flag binari che diventano veri quando viene raggiunto un sotto-obiettivo, come afferrare, sollevare o stabilire il contatto corretto. I flag restano registrati anche se in seguito la policy perde l'oggetto. Se un task ha $K$ stadi, la progressione dell'episodio è:
 
 $$
-P_{\mathrm{task}}=
+P_{\mathrm{task}} =
 \frac{1}{K}
 \sum_{k=1}^{K} b_k
 $$
@@ -91,7 +91,7 @@ In questa espressione, $b_k\in\{0,1\}$ indica se lo stadio $k$ è stato raggiunt
 Il dataset associato a un task può essere scritto come:
 
 $$
-\mathcal{D}_{\mathcal{T}}=
+\mathcal{D}_{\mathcal{T}} =
 \{(s_0,a_0,\ldots,s_T)^{(i)}\}_{i=1}^{N}
 $$
 
@@ -261,11 +261,11 @@ L'**efficienza spaziale** viene misurata mediante la **lunghezza cumulativa del 
 Indicando con $q_t$ la configurazione articolare e con $x_t\in\mathbb{R}^3$ la posizione cartesiana dell'end-effector al tempo $t$, le prime due grandezze sono:
 
 $$
-L_{\mathrm{joint}}=
+L_{\mathrm{joint}} =
 \sum_{t=1}^{T-1}
 \|q_{t+1}-q_t\|_2
 \qquad
-L_{\mathrm{cart}}=
+L_{\mathrm{cart}} =
 \sum_{t=1}^{T-1}
 \|x_{t+1}-x_t\|_2
 $$
@@ -279,7 +279,7 @@ La fluidità viene caratterizzata tramite il **jerk**, cioè la derivata terza d
 Per la traiettoria cartesiana:
 
 $$
-J_{\mathrm{cart}}=
+J_{\mathrm{cart}} =
 \frac{1}{T-3}
 \sum_{t=1}^{T-3}
 \|
@@ -302,7 +302,7 @@ Per misurare l'accoppiamento spaziale, il benchmark calcola la discrepanza verti
 Se $x_t^{(L)},x_t^{(R)}\in\mathbb{R}^3$ sono le rispettive posizioni, la discrepanza verticale $\Delta z$ è definita come segue:
 
 $$
-\Delta z=
+\Delta z =
 \frac{1}{T}
 \sum_{t=1}^{T}
 |x_t^{(L)}[z]-x_t^{(R)}[z]|
@@ -313,15 +313,15 @@ Per l'accoppiamento temporale considera invece la divergenza delle velocità.
 Le velocità cartesiane discrete dei due end-effector sono definite come segue:
 
 $$
-v_t^{(L)}=\frac{x_{t+1}^{(L)}-x_t^{(L)}}{\Delta t}
+v_t^{(L)} = \frac{x_{t+1}^{(L)}-x_t^{(L)}}{\Delta t}
 \qquad
-v_t^{(R)}=\frac{x_{t+1}^{(R)}-x_t^{(R)}}{\Delta t}
+v_t^{(R)} = \frac{x_{t+1}^{(R)}-x_t^{(R)}}{\Delta t}
 $$
 
 La divergenza media delle velocità si ottiene quindi come segue:
 
 $$
-\Delta v=
+\Delta v =
 \frac{1}{T-1}
 \sum_{t=1}^{T-1}
 \|v_t^{(L)}-v_t^{(R)}\|_2
