@@ -8,6 +8,16 @@ L'Imitation Learning studia come apprendere un comportamento a partire da dimost
 
 ## Reinforcement Learning
 
+Il **Reinforcement Learning** formalizza l'apprendimento attraverso l'interazione con un ambiente. Stati, osservazioni, azioni, reward e policy permettono di descrivere sia il problema decisionale sia il processo con cui un agente raccoglie esperienza. Le funzioni valore e le equazioni di Bellman collegano conseguenze immediate e ritorni futuri; su questa base si distinguono prediction, controllo, esplorazione, metodi model-free e metodi model-based.
+
+Il percorso sul [Reinforcement Learning](reinforcement_learning/README.md) parte dai Markov Decision Process e sviluppa programmazione dinamica, Monte Carlo, Temporal-Difference learning, Q-learning, approssimazione delle funzioni, Deep Q-Network, policy gradient e planning con modelli appresi. La parte model-based costituisce il collegamento più diretto con i World Models, mentre policy e traiettorie forniscono il lessico necessario per confrontare RL e Imitation Learning.
+
+## Sistemi stocastici e simulazione
+
+La simulazione a eventi discreti e la ricerca operativa studiano sistemi dinamici soggetti a incertezza mediante modelli probabilistici ed esperimenti computazionali. Pur condividendo con il RL concetti come stato, transizione e criterio di prestazione, questi strumenti non implicano necessariamente che un agente apprenda una policy.
+
+La sezione sui [sistemi stocastici e la simulazione](stochastic_systems/README.md) raccoglie i fondamenti della simulazione, la teoria delle code, il modello a singolo server e i sistemi di inventario. Il percorso è mantenuto separato dal Reinforcement Learning per distinguere l'analisi di un sistema sotto regole assegnate dall'apprendimento di una strategia decisionale.
+
 ## Diffusion Models
 
 I diffusion model apprendono una distribuzione complessa trasformando progressivamente rumore in dati strutturati. In training il modello impara un target locale lungo un processo di perturbazione noto; in inference un sampler usa ripetutamente tale previsione per generare un campione. Nel robot learning la stessa idea consente di rappresentare distribuzioni multimodali di traiettorie o action chunk, al costo di una procedura iterativa e quindi di maggiore latenza.

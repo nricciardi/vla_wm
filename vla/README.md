@@ -342,7 +342,7 @@ L'[approfondimento su $\pi_0$](models/pi0/README.md) sviluppa architettura, flow
 
 ## Reasoning e planning nei VLA
 
-I VLA più recenti non si limitano a collegare un comando linguistico a un movimento locale. Per affrontare attività di più minuti devono anche **interpretare relazioni spaziali, selezionare subtask e aggiornare il piano quando cambia la scena**. Gemini Robotics, $\pi_{0.5}$ e GR00T N1 percorrono tre strade differenti: trasferimento dell'embodied reasoning da un frontier VLM, gerarchia semantica co-addestrata con il controllo e architettura dual-system per embodiment eterogenei.
+I VLA più recenti non si limitano a collegare un comando linguistico a un movimento locale. Per affrontare attività di più minuti devono anche **interpretare relazioni spaziali, selezionare subtask e aggiornare il piano quando cambia la scena**. Gemini Robotics, $\pi_{0.5}$ e GR00T N1 percorrono tre strade differenti: trasferimento dell'embodied reasoning da un frontier VLM, gerarchia semantica co-addestrata con il controllo e architettura dual-system per embodiment eterogenei. ENAP aggiunge una quarta direzione: estrarre dalle dimostrazioni una macchina a stati esplicita che strutturi la policy o le rappresentazioni di un VLA già addestrato.
 
 ### Gemini Robotics (2025)
 
@@ -413,6 +413,24 @@ Il lavoro si concentra soprattutto su manipolazione tabletop short-horizon: loco
 Le neural trajectories possono violare fisica o istruzioni e richiedono filtri e pseudo-label rumorose; inoltre il pre-training principale richiede circa 50,000 ore GPU H100, un **costo molto elevato** nonostante il checkpoint e parte dell'ecosistema siano aperti.
 
 L'[approfondimento su GR00T N1](models/groot/README.md) analizza i due sistemi, il flow matching, la data pyramid, i meccanismi di pseudo-labeling, i benchmark e l'adattamento al GR-1.
+
+### ENAP (2026)
+
+**ENAP**, *Emergent Neural Automaton Policy*, apprende una policy gerarchica composta da un **Probabilistic Mealy Machine** e da una rete neurale residuale. HDBSCAN trasforma le rappresentazioni visuomotorie in simboli discreti; una versione estesa dell'algoritmo $L^*$ ricostruisce stati, transizioni, ramificazioni e cicli; l'automa produce infine una action prior che la rete corregge usando l'osservazione corrente.
+
+Il metodo ammette due modalità. **ENAP(DINO)** parte da dimostrazioni e da un encoder DINOv2, quindi non è intrinsecamente un VLA language-conditioned. **ENAP(FLOWER)** estrae invece la struttura dalle rappresentazioni multimodali di un VLA preesistente e la usa per migliorarne il controllo long-horizon.
+
+Gli esperimenti simulati usano circa 400 traiettorie per task con un **Franka Panda** in ManiSkill e CALVIN. Le prove reali impiegano circa 25 dimostrazioni per task e un **Kinova Gen3** su assemblaggio Lego, sorting di oggetti e trasferimento di una gruccia. In CALVIN, ENAP(FLOWER) porta il completamento della sequenza gerarchica di cinque subtask dal 15.9% di FLOWER al 28.2%; sul robot reale ENAP(DINO) supera la versione fine-tuned di $\pi_{0.5}$ nei tre task riportati.
+
+![ENAP estrae un automa e lo combina con il controllo residuale](models/enap/figures/enap_pipeline.jpg)
+
+#### Novelty
+
+La novelty consiste nel fare emergere **una struttura simbolica task-level direttamente dalle traiettorie visuomotorie**, senza predicati o label di fase progettati manualmente, e nel collegarla a un controller continuo mediante una correzione residuale. Branching e self-loop rendono esplicite strategie multimodali, persistenza e retry.
+
+#### Limiti
+
+La struttura è sensibile a encoder, clustering, soglia di similarità e copertura delle dimostrazioni. Le etichette semantiche visualizzate vengono attribuite a posteriori e l'automa interpretabile non fornisce da solo garanzie formali. Cross-task e cross-embodiment restano aperti; inoltre il repository pubblico implementa attualmente soltanto una release semplificata centrata su PegInsertionSide. L'[approfondimento su ENAP](models/enap/README.md) sviluppa PMM, astrazione simbolica, $L^*$ esteso, controllo bi-level, training iterativo, task, risultati e failure mode.
 
 
 ## Real-time VLA
@@ -500,6 +518,7 @@ Tuttavia non ogni output testuale costituisce vero planning e non ogni action ch
 | **Gemini Robotics** | Un VLA Gemini-based integra comprensione multimodale, decomposizione e controllo; la variante Gemini Robotics-ER enfatizza reasoning spaziale, planning e progress estimation | Collega capacità web-scale a pianificazione e azione multi-embodiment |
 | **$\pi_{0.5}$** | Lo stesso modello viene co-addestrato a produrre azioni e target semantici di alto livello | Può alternare predizione di subtask e controllo low-level, favorendo generalizzazione open-world |
 | **GR00T** | Architettura dual-system: un VLM interpreta contesto e istruzione, mentre un action expert generativo produce traiettorie | Separa rappresentazione vision-language e generazione motoria per umanoidi e altri embodiment |
+| **Neural Automaton Policy** | Una struttura discreta appresa dalle traiettorie seleziona una action prior, poi una rete residuale corregge il comando | ENAP rende espliciti fasi, branching e retry senza imporre predicati simbolici, ma dipende dalla copertura delle dimostrazioni |
 | **Reasoning-augmented VLA** | Il VLA riceve piani, chain of skills, affordance o subgoal generati esplicitamente | Migliora task lunghi se le rappresentazioni intermedie sono verificabili e grounded |
 | **World-model-assisted VLA** | Un world model predice conseguenze o video futuri e aiuta a scegliere piano o azione | Introduce look-ahead, ma efficacia e costo dipendono dalla fedeltà della dinamica appresa |
 
