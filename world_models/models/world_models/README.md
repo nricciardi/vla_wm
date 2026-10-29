@@ -1,14 +1,14 @@
 # World Models (2018)
 
-Il paper [*World Models*](https://arxiv.org/abs/1803.10122), pubblicato da David Ha e Jürgen Schmidhuber nel 2018, propone un agente nel quale la maggior parte della capacità rappresentazionale non risiede nella policy, ma in un **modello generativo dell'ambiente** appreso dai dati.
+Il paper [*World Models*](https://arxiv.org/abs/1803.10122) propone un agente nel quale la maggior parte della capacità rappresentazionale non risiede nella policy, ma in un **modello generativo dell'ambiente** appreso dai dati.
 
 Il titolo del lavoro ha contribuito a rendere popolare l'espressione *World Model*, ma il sistema studiato è più specifico dell'accezione moderna del termine. Non apprende un modello fisico strutturato e non effettua Model Predictive Control. Impara invece una dinamica probabilistica nello spazio latente delle immagini e ne espone lo stato al controller.
 
 L'idea centrale è separare tre funzioni:
 
-- **Vision (V)** comprime ogni osservazione visiva in un latent di bassa dimensionalità;
-- **Memory (M)** integra la storia e predice la distribuzione del prossimo latent;
-- **Controller (C)** usa rappresentazione corrente e memoria predittiva per scegliere l'azione.
+- **Vision (V)** comprime ogni osservazione visiva in un latent di bassa dimensionalità
+- **Memory (M)** integra la storia e predice la distribuzione del prossimo latent
+- **Controller (C)** usa rappresentazione corrente e memoria predittiva per scegliere l'azione
 
 Questa separazione permette di addestrare V e M con backpropagation su obiettivi supervisionati o auto-supervisionati ben definiti, lasciando all'ottimizzazione della policy soltanto un numero ridotto di parametri.
 
@@ -17,8 +17,6 @@ Questa separazione permette di addestrare V e M con backpropagation su obiettivi
 Al tempo $t$, l'ambiente produce un'osservazione RGB $o_t$. Il VAE la converte nel latent $z_t$, mentre l'MDN-RNN aggiorna lo stato ricorrente $h_t$ usando il latent e l'azione. Il controller riceve sia $z_t$, che descrive l'osservazione corrente, sia $h_t$, che riassume la storia e contiene informazione predittiva sul futuro.
 
 ![Pipeline tra osservazione, VAE, MDN-RNN e controller](figures/world_models_agent_pipeline.png)
-
-*Fonte: Ha e Schmidhuber, World Models, Figura 8. Il riquadro tratteggiato identifica il World Model formato da VAE e MDN-RNN; il controller rimane un modulo separato.*
 
 ### Vision model
 
@@ -111,8 +109,6 @@ L'MDN-RNN può anche essere eseguito autoregressivamente: il modello campiona $z
 
 ![CarRacing generato autoregressivamente dal World Model](figures/world_models_car_racing_dream.png)
 
-*Fonte: Ha e Schmidhuber, World Models, Figura 13. Il frame proviene dall'ambiente CarRacing immaginato dall'MDN-RNN e renderizzato dal decoder del VAE; il parametro $\tau$ controlla la temperatura del sampling.*
-
 Questa visualizzazione mostra che il modello ha appreso regolarità sufficienti a produrre una strada e il movimento del veicolo, ma non dimostra da sola accuratezza a lungo orizzonte. Il frame è infatti una decodifica di uno stato latente campionato, non un confronto quantitativo con il futuro reale che sarebbe seguito alla stessa sequenza di azioni.
 
 ## VizDoom: Take Cover
@@ -138,8 +134,6 @@ L'esperimento VizDoom espone anche il limite più importante dell'approccio. Ott
 In alcune prove l'agente impara a muoversi in modo da impedire al modello di generare le palle di fuoco o da farle scomparire. La policy non ha imparato a evitare il pericolo: ha scoperto una **imperfezione della dinamica appresa**.
 
 ![Una adversarial policy sfrutta il World Model e fa scomparire le palle di fuoco](figures/world_models_model_exploitation.png)
-
-*Fonte: Ha e Schmidhuber, World Models, Figura 18. Nel rollout immaginato il controller trova una traiettoria che estingue automaticamente le palle di fuoco, comportamento non valido nell'ambiente VizDoom originale.*
 
 La temperatura rende visibile il problema. Con $\tau=0.10$, il modello quasi deterministico soffre di mode collapse e genera raramente le palle di fuoco: la policy ottiene $2,086\pm140$ nel sogno ma soltanto $193\pm58$ nell'ambiente originale. Con $\tau=1.15$, il reward virtuale scende a $918\pm546$, mentre quello reale sale a $1,092\pm556$.
 

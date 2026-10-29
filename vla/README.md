@@ -563,6 +563,10 @@ La raccolta non determina da sola la validità di un dataset: deduplicazione e s
 
 ## Evaluation per VLA
 
+### Interpretabilità delle policy di navigazione
+
+Il successo di una traiettoria non rivela quali indizi visivi, parti dell'istruzione o osservazioni passate abbiano determinato le azioni. Lo studio *What do VLM-Based Vision-Language Navigation Models Rely on* confronta quattro policy di **Vision-Language Navigation** mediante perturbazioni degli input e interventi sulle rappresentazioni interne. Mostra che la sensibilità a un indizio non coincide necessariamente con il suo contributo al successo in closed loop e che alcune rappresentazioni possono essere usate per orientare il comportamento senza aggiornare i pesi. Il [capitolo sull'interpretabilità della navigazione](interpretability/README.md) introduce il problema e rimanda all'analisi sperimentale del paper.
+
 ### Benchmark simulati
 
 I benchmark simulati rendono **ripetibili reset, perturbazioni e condizioni di successo**.

@@ -8,7 +8,11 @@ $$
 p(s_{t+1:t+H}\mid s_t,a_{t:t+H-1})
 $$
 
-Nei sistemi embodied lo stato reale non è normalmente accessibile. Il modello riceve osservazioni $o_t$, come immagini, propriocezione o segnali tattili, e può quindi predire direttamente osservazioni future oppure costruire uno **stato latente** che conserva le informazioni necessarie per previsione e controllo. Nei sistemi condizionati dal linguaggio, un'istruzione $l$ può inoltre specificare il task o il futuro desiderato:
+Nei sistemi embodied lo stato reale non è normalmente accessibile. 
+
+Il modello riceve osservazioni $o_t$, come immagini, propriocezione o segnali tattili, e può quindi predire direttamente **osservazioni future** oppure costruire uno **stato latente** che conserva le informazioni necessarie per previsione e controllo. 
+
+Nei sistemi condizionati dal linguaggio, un'istruzione $l$ può inoltre specificare il task o il futuro desiderato:
 
 $$
 p(o_{t+1:t+H}\mid o_{\leq t},a_{t:t+H-1},l)
@@ -22,39 +26,56 @@ Un World Model diventa utile a un agente quando permette di **anticipare le cons
 
 ### Spazio dello stato
 
-Saranno confrontati i modelli che **predicono variabili fisiche** strutturate, quelli che **generano immagini o video** e quelli che operano in uno **spazio latente**. La scelta determina quali dettagli vengono conservati, quanto costa effettuare un rollout e quanto facilmente la predizione può essere impiegata per il controllo.
+Un world model può essere classificato in base all'**spazio dello stato** in cui opera, si possono identificare i modelli che:
+
+- **Predicono variabili fisiche** strutturate
+- **Generano immagini o video**
+- Operano in uno **spazio latente**
+
+La scelta determina quali dettagli vengono conservati, quanto costa effettuare un rollout e quanto facilmente la predizione può essere impiegata per il controllo.
 
 ### Modelli deterministici e stocastici
 
 Una singola azione può produrre esiti differenti a causa di informazione incompleta, rumore e interazioni non osservate. Verranno quindi distinti i transition model deterministici dai modelli probabilistici capaci di rappresentare **futuri multimodali**, separando per quanto possibile incertezza aleatorica e incertezza epistemica.
 
-### World Model espliciti, impliciti e orientati al controllo
-
-Un World Model può essere un modulo esplicitamente interrogabile, una dinamica latente usata per il planning oppure una capacità predittiva internalizzata nella policy. Sarà inoltre chiarita la differenza tra ricostruire accuratamente l'ambiente e apprendere soltanto le variabili sufficienti a predire reward, value o conseguenze rilevanti per la decisione.
-
 ### Ruoli nel ciclo decisionale
 
-La tassonomia distinguerà quattro impieghi principali: **planning mediante rollout**, apprendimento della policy in imagination, simulazione ed evaluation, generazione di dati sintetici. La stessa architettura può ricoprire più ruoli, ma richiede proprietà diverse a seconda che debba generare immagini realistiche, preservare la causalità delle azioni o classificare correttamente il successo di un comportamento.
+Impieghi principali: 
+
+- Planning mediante rollout
+- Apprendimento della policy in imagination
+- Simulazione ed evaluation
+- Generazione di dati sintetici
+
+La stessa architettura può ricoprire più ruoli, ma richiede proprietà diverse a seconda che debba generare immagini realistiche, preservare la causalità delle azioni o classificare correttamente il successo di un comportamento.
 
 ## Dinamiche latenti e controllo in imagination
 
-Questa parte ricostruirà il passaggio dai modelli compatti della dinamica ai sistemi che pianificano o addestrano actor e critic interamente su traiettorie latenti. Il confronto chiarirà la differenza tra **planning online**, eseguito a ogni passo, e *learning in imagination*, nel quale il modello viene sfruttato soprattutto durante il training.
+Il confronto chiarirà la differenza tra **planning online**, eseguito a ogni passo, e **learning in imagination**, nel quale il modello viene sfruttato soprattutto durante il training.
 
 ### World Models (2018)
 
-**World Models**, di David Ha e Jürgen Schmidhuber, mostra come separare la complessità dell'apprendimento in un grande modello predittivo e in un controller molto piccolo. Le osservazioni RGB vengono compresse da un **Variational Autoencoder (VAE)** in un vettore latente $z_t$; un **Mixture Density Network-Recurrent Neural Network (MDN-RNN)** usa $z_t$, l'azione $a_t$ e la propria memoria $h_t$ per modellare una distribuzione sul latent successivo; un controller lineare trasforma infine $z_t$ e $h_t$ nell'azione.
+**World Models** mostra come separare la complessità dell'apprendimento in un grande **modello predittivo** e in un **controller** molto piccolo. 
 
-Il paper considera due ambienti OpenAI Gym simulati, senza robot fisici. In **CarRacing-v0** il modello viene addestrato su 10,000 rollout di una policy casuale e fornisce al controller una rappresentazione spazio-temporale appresa dai pixel. Il sistema completo raggiunge un reward medio di $906\pm21$ su 100 episodi, contro $632\pm251$ quando il controller vede soltanto il latent del VAE.
+1. Le osservazioni RGB vengono compresse da un **Variational Autoencoder** (VAE) in un vettore latente $z_t$
+2. Un **Mixture Density Network-Recurrent Neural Network** (MDN-RNN) usa $z_t$, l'azione $a_t$ e la propria memoria $h_t$ per modellare una distribuzione sul latent successivo
+3. Un controller lineare trasforma infine $z_t$ e $h_t$ nell'azione
 
-In **VizDoom: Take Cover** il ruolo del World Model è più radicale: oltre al prossimo latent, l'MDN-RNN predice la terminazione dell'episodio e diventa un ambiente virtuale nel quale il controller viene addestrato interamente con CMA-ES. La policy viene poi trasferita senza ulteriore training al simulatore originale, dove raggiunge $1,092\pm556$ step di sopravvivenza rispetto alla soglia di 750 richiesta dal task.
+Il paper considera due ambienti OpenAI Gym simulati, senza robot fisici. In **CarRacing-v0** il modello viene addestrato su 10,000 rollout di una policy casuale e fornisce al controller una rappresentazione spazio-temporale appresa dai pixel.
+
+In **VizDoom: Take Cover** il ruolo del World Model è più radicale: oltre al prossimo latent, l'MDN-RNN predice la terminazione dell'episodio e diventa un **ambiente virtuale nel quale il controller viene addestrato** interamente con CMA-ES. La policy viene poi trasferita senza ulteriore training al simulatore originale, dove raggiunge $1,092\pm556$ step di sopravvivenza rispetto alla soglia di 750 richiesta dal task.
 
 #### Novelty
 
-Il contributo centrale è la decomposizione **Vision–Memory–Controller** e la dimostrazione che una policy può essere ottimizzata dentro la dinamica appresa e successivamente trasferita nell'ambiente reale del benchmark. Il lavoro rende inoltre esplicita un'idea destinata a diventare centrale: il controller non deve necessariamente ricostruire o comprendere ogni dettaglio dell'osservazione, ma può agire usando una rappresentazione compatta del presente e del futuro probabile.
+Il contributo centrale è la decomposizione **Vision–Memory–Controller** e la dimostrazione che una policy può essere ottimizzata dentro la dinamica appresa e successivamente trasferita nell'ambiente reale del benchmark. 
+
+Il lavoro rende inoltre esplicita un'idea destinata a diventare centrale: il controller non deve necessariamente ricostruire o comprendere ogni dettaglio dell'osservazione, ma può agire usando una **rappresentazione compatta del presente e del futuro probabile**.
 
 #### Limiti
 
-VAE, MDN-RNN e controller vengono addestrati separatamente, perciò la rappresentazione visuale non è ottimizzata per preservare ciò che è rilevante al task. I dati provengono da policy casuali e da ambienti semplici; gli esperimenti non affrontano robot reali, contatti complessi o generalizzazione tra task.
+VAE, MDN-RNN e controller vengono addestrati separatamente, perciò la rappresentazione visuale **non è ottimizzata per preservare ciò che è rilevante al task**. 
+
+I dati provengono da **policy casuali e da ambienti semplici**; gli esperimenti non affrontano robot reali, contatti complessi o generalizzazione tra task.
 
 Il controller può inoltre trovare **adversarial policy che sfruttano gli errori del World Model** e visitano stati fuori distribuzione. Il paper attenua il problema aumentando la temperatura del modello stocastico, ma non lo risolve in modo generale.
 
@@ -62,9 +83,13 @@ L'[approfondimento su World Models](models/world_models/README.md) sviluppa arch
 
 ### PlaNet (2019)
 
-**PlaNet**, acronimo di *Deep Planning Network*, apprende dai pixel un modello della dinamica e lo usa per scegliere le azioni mediante planning online. A differenza di World Models, non addestra un controller separato: a ogni step valuta sequenze di azioni nel modello appreso, esegue soltanto la prima azione e pianifica nuovamente dopo la successiva osservazione.
+**PlaNet**, acronimo di *Deep Planning Network*, apprende dai pixel un modello della dinamica e lo usa per scegliere le azioni mediante planning online. 
 
-Il cuore dell'architettura è il **Recurrent State-Space Model (RSSM)**. Lo stato latente combina una memoria deterministica $h_t$, che conserva informazione nel tempo, e una variabile stocastica $s_t$, che rappresenta incertezza e futuri multipli. Un observation model ricostruisce $o_t$ per fornire un segnale di training ricco, mentre un reward model predice $r_t$ direttamente dal latent. Durante il planning le immagini non vengono decodificate: il **Cross-Entropy Method (CEM)** cerca le azioni usando soltanto transizioni e reward latenti.
+A differenza di World Models, **non addestra un controller separato**: a ogni step valuta sequenze di azioni nel modello appreso, esegue soltanto la prima azione e pianifica nuovamente dopo la successiva osservazione.
+
+Il cuore dell'architettura è il **Recurrent State-Space Model (RSSM)**. Lo stato latente combina una memoria deterministica $h_t$, che conserva informazione nel tempo, e una variabile stocastica $s_t$, che rappresenta incertezza e futuri multipli. 
+
+Un observation model ricostruisce $o_t$ per fornire un segnale di training ricco, mentre un reward model predice $r_t$ direttamente dal latent. Durante il planning le immagini non vengono decodificate: il **Cross-Entropy Method (CEM)** cerca le azioni usando soltanto transizioni e reward latenti.
 
 PlaNet viene valutato su sei task simulati della **DeepMind Control Suite** osservati attraverso immagini RGB da $64\times64$ pixel: Cartpole Swing Up, Reacher Easy, Cheetah Run, Finger Spin, Cup Catch e Walker Walk. I task comprendono partial observability, reward sparsi, contatti e controllo continuo; non sono coinvolti robot fisici.
 
@@ -85,15 +110,78 @@ Gli esperimenti rimangono limitati a simulatori con immagini semplici, reward di
 
 L'[approfondimento su PlaNet](models/planet/README.md) sviluppa inferenza e dinamica dell'RSSM, obiettivo variazionale, latent overshooting, planning con CEM e risultati sulla DeepMind Control Suite.
 
-### Dreamer, DreamerV2 e DreamerV3 (2020, 2021, 2023)
+### Dreamer (2020)
 
-La famiglia Dreamer mostrerà come sostituire il planning online con l'apprendimento di actor e critic su rollout immaginati. L'approfondimento seguirà l'evoluzione dell'RSSM, degli obiettivi di training e delle tecniche di stabilizzazione, separando i progressi sui benchmark dalla robustezza richiesta in un sistema fisico.
+**Dreamer** sostituisce il planning online di PlaNet con una **policy appresa in imagination**. 
+
+Un RSSM con stati stocastici gaussiani apprende dinamica e reward dalle immagini; actor e critic vengono poi addestrati su traiettorie latenti generate dal modello. Il critic stima il return oltre l'orizzonte immaginato, mentre l'actor riceve gradienti che attraversano azioni, transizioni, reward e value predetti. Durante l'esecuzione basta aggiornare lo stato latente con l'osservazione e interrogare l'actor.
+
+Il dataset è un **replay buffer raccolto online**, inizializzato con cinque episodi casuali, senza dimostrazioni expert. Il confronto principale copre 20 task visuali della DeepMind Control Suite, con embodiment simulati di locomozione e manipolazione e immagini RGB da $64\times64$ pixel. Dopo 5 milioni di step Dreamer ottiene un return medio di circa 823, rispetto a circa 333 di PlaNet allo stesso budget e 786 di D4PG dopo 100 milioni di step. Non vengono utilizzati robot fisici. [Fonte: Dream to Control](https://arxiv.org/pdf/1912.01603).
+
+#### Novelty
+
+- Apprende actor e critic **interamente da rollout latenti**, sostituendo la ricerca di azioni a ogni decisione.
+- Propaga **gradienti analitici del return attraverso la dinamica appresa**, sfruttando la riparametrizzazione delle variabili continue.
+- Usa il **value bootstrap e i $\lambda$-return** per apprendere comportamenti con conseguenze oltre l'orizzonte immaginato.
+
+#### Limiti
+
+La policy ottimizza il futuro predetto dal modello e può quindi sfruttarne gli errori. La ricostruzione visuale non garantisce che il latent preservi tutte le proprietà rilevanti per il controllo; manca inoltre una stima esplicita dell'incertezza epistemica. I risultati principali riguardano task simulati e agenti addestrati separatamente, senza dimostrare trasferimento tra embodiment o controllo fisico.
+
+L'[approfondimento su Dreamer](models/dreamer/README.md) sviluppa RSSM gaussiano, training del modello, gradienti in imagination, stima del return e confronto con PlaNet.
+
+### DreamerV2 (2021)
+
+**DreamerV2** mantiene il ciclo modello–imagination–interazione, ma sostituisce i latent gaussiani con **variabili categoriche** e introduce il **KL balancing**: il prior viene addestrato ad avvicinarsi al posterior più intensamente di quanto il posterior venga regolarizzato verso il prior. I campioni discreti usano gradienti straight-through; per l'actor, Atari beneficia invece dell'estimatore REINFORCE con baseline del critic.
+
+Il replay buffer viene raccolto online nei **55 giochi Atari** del protocollo del paper, con sticky actions, osservazioni visuali e 200 milioni di frame per gioco. DreamerV2 supera il livello umano secondo il punteggio mediano normalizzato e i baseline IQN e Rainbow nel confronto su singola GPU. Il lavoro include anche Humanoid Walk e Humanoid Stand della DeepMind Control Suite da pixel: l'embodiment è un umanoide simulato, senza esperimenti su robot reali. [Fonte: Mastering Atari with Discrete World Models](https://arxiv.org/pdf/2010.02193).
+
+#### Novelty
+
+- Introduce nell'RSSM **32 variabili categoriche con 32 classi ciascuna**, apprendibili mediante gradienti straight-through.
+- Separa con il **KL balancing** l'apprendimento della dinamica dalla pressione che rende le rappresentazioni predicibili.
+- Dimostra prestazioni di livello umano su Atari mediante **behavior learning in un World Model addestrato separatamente dalla policy**.
+- Confronta gradienti REINFORCE e gradienti attraverso la dinamica, mostrando che la scelta efficace dipende dal tipo di action space.
+
+#### Limiti
+
+Il risultato aggregato non implica prestazioni umane in ogni gioco, e il budget di 200 milioni di frame resta elevato. Training del modello e rollout immaginati richiedono molto calcolo. Alcuni iperparametri cambiano tra Atari e controllo continuo; gli stati discreti non risolvono da soli errori di dinamica, esplorazione difficile o trasferimento al mondo fisico.
+
+L'[approfondimento su DreamerV2](models/dreamerv2/README.md) approfondisce rappresentazioni discrete, KL balancing, actor-critic e protocollo Atari.
+
+### DreamerV3 (2023)
+
+**DreamerV3** rende l'apprendimento in imagination più robusto a domini con osservazioni, reward e action space differenti. Conserva l'RSSM discreto, ma combina **trasformazioni symlog, predizioni distribuzionali di reward e value, free bits, regolarizzazione delle distribuzioni categoriche e normalizzazione dei return**. L'obiettivo è riutilizzare la stessa configurazione dell'algoritmo senza doverla adattare manualmente a ogni benchmark.
+
+Il paper, introdotto nel 2023 e qui analizzato nella revisione arXiv del 2024, valuta oltre **150 task in otto domini**: Atari, ProcGen, DMLab, Atari100k, controllo propriocettivo e visuale della DeepMind Control Suite, BSuite e Minecraft. I dati vengono raccolti online da ciascun agente; gli embodiment di controllo rimangono simulati. In Minecraft il modello apprende a ottenere diamanti senza dimostrazioni umane né curriculum. **Configurazione condivisa non significa policy universale**: gli agenti vengono addestrati separatamente nei diversi task. [Fonte: Mastering Diverse Domains through World Models, revisione v2](https://arxiv.org/pdf/2301.04104v2).
+
+#### Novelty
+
+- Combina trasformazioni e **loss distribuzionali** per gestire target di ordini di grandezza differenti.
+- Integra **KL bilanciata, free bits e uniform mixing** per stabilizzare le rappresentazioni discrete tra domini.
+- Normalizza la scala dei return con **percentili e un denominatore minimo**, mantenendo un coefficiente di entropia condiviso.
+- Verifica robustezza su oltre 150 task e benefici dello scaling di dimensione del modello e replay ratio.
+- Dimostra l'apprendimento del task Minecraft Diamond da interazione, senza dati expert o curriculum.
+
+#### Limiti
+
+La robustezza tra benchmark non equivale a generalizzazione zero-shot, apprendimento multi-task in un unico modello o garanzie sulla dinamica. Il replay ratio e la dimensione delle reti continuano a determinare il costo computazionale. Gli esperimenti non verificano latenza, sicurezza o adattamento sui robot fisici; Minecraft mantiene inoltre un reward definito dall'ambiente, con segnali intermedi legati alla progressione.
+
+L'[approfondimento su DreamerV3](models/dreamerv3/README.md) sviluppa le tecniche di stabilizzazione, i protocolli dei diversi domini e il significato dello scaling.
 
 ### MuZero (2020)
 
-**MuZero** combina un modello della dinamica appreso con **Monte Carlo Tree Search (MCTS)**, senza cercare di ricostruire le osservazioni o di imitare lo stato reale dell'ambiente. Una representation function trasforma la storia osservata in uno stato latente; una dynamics function applica un'azione ipotetica e produce il latent successivo e il reward; una prediction function stima policy e value. La rappresentazione viene quindi ottimizzata soltanto per conservare le informazioni utili alla decisione.
+**MuZero** combina un modello della dinamica appreso con **Monte Carlo Tree Search (MCTS)**, senza cercare di ricostruire le osservazioni o di imitare lo stato reale dell'ambiente. 
 
-Durante l'esecuzione, MCTS costruisce un albero nello spazio latente usando policy e value per guidare la ricerca e i reward predetti per valutarne i rami. Durante il training, le tre funzioni vengono apprese congiuntamente su sequenze reali: policy e value devono riprodurre i target migliorati dalla ricerca, mentre il reward deve corrispondere a quello osservato. Si crea così un ciclo di **search-based policy iteration** nel quale il modello migliora la ricerca e la ricerca fornisce target migliori al modello.
+1. Una **representation function** trasforma la storia osservata in uno **stato latente**
+2. Una dynamics function **applica un'azione ipotetica e produce il latent successivo e il reward**
+3. Una **prediction function stima policy e value**
+
+La rappresentazione viene quindi **ottimizzata soltanto per conservare le informazioni utili alla decisione**.
+
+Durante l'esecuzione, MCTS costruisce un albero nello spazio latente usando policy e value per guidare la ricerca e i reward predetti per valutarne i rami. 
+
+Durante il training, le tre funzioni vengono apprese congiuntamente su sequenze reali: policy e value devono riprodurre i target migliorati dalla ricerca, mentre il reward deve corrispondere a quello osservato. Si crea così un ciclo di **search-based policy iteration** nel quale il modello migliora la ricerca e la ricerca fornisce target migliori al modello.
 
 Gli esperimenti coprono Go, scacchi e shogi mediante self-play e tutti i 57 giochi dell'**Arcade Learning Environment** a partire da frame RGB. Non sono coinvolti robot fisici. Nei giochi da tavolo MuZero eguaglia le prestazioni sovrumane di AlphaZero pur sostituendo il simulatore perfetto con una dinamica appresa; su Atari supera i precedenti risultati model-free e model-based del confronto originale. La variante MuZero Reanalyze raggiunge un punteggio mediano normalizzato rispetto all'essere umano del 731.1% usando 200 milioni di frame per gioco.
 
@@ -106,7 +194,7 @@ Gli esperimenti coprono Go, scacchi e shogi mediante self-play e tutti i 57 gioc
 
 #### Limiti
 
-Il modello è deterministico e non rappresenta esplicitamente l'incertezza o futuri multimodali. Il suo latent non deve essere interpretabile né fisicamente fedele: è adatto a scegliere azioni secondo il reward di training, ma non costituisce un simulatore generativo interrogabile per altri scopi.
+Il modello è **deterministico e non rappresenta esplicitamente l'incertezza o futuri multimodali**. Il suo latent non deve essere interpretabile né fisicamente fedele: è adatto a scegliere azioni secondo il reward di training, ma non costituisce un simulatore generativo interrogabile per altri scopi.
 
 I risultati richiedono grandi quantità di esperienza e calcolo distribuito, mentre MCTS introduce un costo online per ogni decisione. Tutti gli action space sperimentali sono discreti e l'ambiente continua a fornire reward, osservazioni e azioni legali al nodo radice. Il paper non dimostra quindi controllo continuo, trasferimento tra task o uso su robot reali.
 
@@ -295,15 +383,62 @@ L'[approfondimento su Unified World Models](models/unified_world_models/README.m
 
 ### WorldVLA (2025)
 
-WorldVLA illustrerà l'integrazione autoregressiva di comprensione multimodale, generazione delle azioni e previsione delle immagini future. La trattazione distinguerà il World Model usato come segnale di training dalla generazione esplicita del futuro durante l'inference e analizzerà il problema dell'allineamento causale tra azione e predizione.
+**WorldVLA** unifica policy e World Model in un Transformer autoregressivo inizializzato da **Chameleon**. Immagini, testo e azioni vengono discretizzati in un vocabolario condiviso: il modello genera azioni dall'istruzione $l$ e dalla storia visuale, oppure predice il prossimo frame a partire da immagini e azioni. Le due modalità condividono i parametri e vengono addestrate con loss di cross-entropy sui rispettivi token. Una maschera di attenzione impedisce alle azioni successive di un chunk di dipendere dalle azioni precedenti, riducendo la propagazione degli errori.
+
+Il training robotico utilizza dimostrazioni **LIBERO**, con un Franka Emika Panda simulato e azioni a sette componenti per posa relativa dell'end-effector e pinza. Il paper non usa pretraining su grandi dataset robotici e non presenta esperimenti su robot fisici. A risoluzione $512\times512$ raggiunge l'81.8% medio sulle quattro suite LIBERO, contro il 76.5% di OpenVLA e il 95.4% di OpenVLA-OFT nel confronto riportato. Le ablation a backbone condiviso mostrano un beneficio del World Model per la policy e della maschera per l'action chunking. [Fonte: WorldVLA](https://arxiv.org/pdf/2506.21539v1).
+
+#### Novelty
+
+- Unifica **comprensione e generazione di immagini e azioni** in un backbone autoregressivo con token condivisi.
+- Addestra congiuntamente policy e **predizione visuale condizionata dalle azioni**, verificandone i benefici reciproci.
+- Introduce una **maschera di attenzione per gli action chunk** che limita la dipendenza dagli errori delle azioni precedenti.
+- Confronta l'utilità della forward prediction action-conditioned con la video prediction condizionata soltanto dal task.
+
+#### Limiti
+
+Il World Model migliora il training della policy, ma gli esperimenti non dimostrano un planner che confronti online futuri alternativi mediante reward o value. Le metriche video non garantiscono causalità fisica e non migliorano uniformemente a tutti gli orizzonti. Tokenizzazione, costo autoregressivo e bassa reattività dei chunk lunghi restano vincoli; i risultati riguardano soltanto manipolazione simulata.
+
+L'[approfondimento su WorldVLA](models/worldvla/README.md) sviluppa tokenizzazione, training congiunto, maschere di attenzione e risultati LIBERO, distinguendo policy diretta e planning potenziale.
 
 ### Cosmos Policy (2026)
 
-Cosmos Policy mostrerà come adattare un video diffusion model pre-addestrato al controllo rappresentando azioni, stati futuri e value come ulteriori frame latenti. Il capitolo confronterà l'uso diretto come policy con l'uso per planning e valuterà il vantaggio dei prior appresi dai video rispetto ai costi di inferenza e adattamento.
+**Cosmos Policy** adatta **Cosmos-Predict2-2B**, un video diffusion model pre-addestrato, al controllo robotico mediante **latent frame injection**. Propriocezione, chunk di azioni e value vengono normalizzati e inseriti come frame nella sequenza latente accanto alle immagini multi-view. Il modello apprende con lo stesso denoising a generare azioni, osservazioni future e return, senza aggiungere un action expert o un inverse dynamics model.
+
+Il post-training usa 2,000 dimostrazioni **LIBERO**, 1,200 dimostrazioni umane **RoboCasa** e, per gli esperimenti fisici, 185 dimostrazioni distribuite su quattro task **ALOHA**. I benchmark simulati usano un Franka Panda; ALOHA impiega due bracci ViperX 300 S, tre camere e controllo a 25 Hz. Come policy diretta, Cosmos Policy raggiunge il 98.5% su LIBERO, il 67.1% su RoboCasa e uno **score medio di completamento del 93.6%** su ALOHA. Quest'ultima metrica comprende completamento parziale e non coincide con una percentuale di episodi interamente riusciti. [Fonte: Cosmos Policy](https://arxiv.org/pdf/2601.16163v1).
+
+Il **planning online best-of-N** richiede un ulteriore adattamento su 648 rollout, inclusi fallimenti: un checkpoint propone azioni e un secondo ne predice futuro e value. Su condizioni più difficili di due task ALOHA, il confronto passa dal 59.5 al 72.0 di score medio, un aumento di 12.5 punti.
+
+#### Novelty
+
+- Trasforma azioni, propriocezione e value in **frame latenti compatibili con un video backbone pre-addestrato**.
+- Unifica policy, forward dynamics e value modificando il condizionamento nel denoising.
+- Separa l'uso come **policy diretta** dall'uso per **planning con futuri e value predetti**.
+- Integra rollout della policy, oltre alle dimostrazioni, per apprendere esiti e fallimenti utili alla selezione delle azioni.
+
+#### Limiti
+
+Il planner esplora un solo livello di chunk e non una sequenza profonda di decisioni. Il training da sole dimostrazioni non copre adeguatamente i fallimenti. Negli esperimenti di planning, otto H100 producono un chunk in circa 4.9 secondi; anche la policy diretta su ALOHA introduce una pausa di circa 0.95 secondi. Il modello usa osservazioni correnti e un futuro all'estremità del chunk, senza memoria esplicita di una lunga storia.
+
+L'[approfondimento su Cosmos Policy](models/cosmos_policy/README.md) sviluppa latent injection, obiettivi congiunti, adattamento sui rollout, best-of-N e protocolli di valutazione.
 
 ### VLA-JEPA (2026)
 
-VLA-JEPA rappresenterà l'alternativa alla generazione dei pixel: il modello predice **target latenti futuri** e usa tale obiettivo per apprendere transizioni rilevanti per l'azione. L'approfondimento chiarirà la relazione con la famiglia JEPA, le precauzioni contro la fuga di informazione dai frame futuri e il compromesso tra efficienza e interpretabilità.
+**VLA-JEPA** usa la **predizione di stati latenti futuri** per pre-addestrare una policy, evitando la ricostruzione dei pixel. Un encoder **V-JEPA2 congelato** produce i target; **Qwen3-VL-2B** riceve osservazione corrente e istruzione $l$ e genera latent action token che condizionano un World Model temporale. I frame futuri supervisionano la predizione, ma non entrano nel VLM che produce tali token. Nel fine-tuning robotico, una testa flow matching apprende i comandi continui mantenendo l'obiettivo di allineamento latente.
+
+Il pretraining combina circa **220,000 video Something-Something-v2** senza comandi robotici e **76,000 traiettorie DROID** con azioni. Il fine-tuning usa LIBERO, Fractal e BridgeV2; i test coprono LIBERO e LIBERO-Plus con Franka Panda simulato, SimplerEnv con Google Robot e WidowX, e un **Franka Research 3 con Robotiq 2F-85** fisico, addestrato su 100 dimostrazioni. Il paper riporta il 97.2% medio su LIBERO e il 79.5% su LIBERO-Plus, contro il 96.1% e il 62.9% della variante senza video umani. [Fonte: VLA-JEPA, revisione v2](https://arxiv.org/pdf/2602.10098v2).
+
+#### Novelty
+
+- Apprende rappresentazioni di transizione mediante **allineamento con stati V-JEPA2**, senza decoder visuale.
+- Separa il percorso che produce i latent action token dai frame futuri, riducendo gli shortcut da **information leakage**.
+- Integra video umani action-free e dati robotici annotati in un pretraining con obiettivi compatibili.
+- Mantiene la supervisione dinamica durante il fine-tuning di una testa di azione flow matching.
+
+#### Limiti
+
+Il latent action non è un comando fisico identificato e il World Model non viene valutato come planner online o simulatore di interventi robotici arbitrari. I video umani non migliorano ogni benchmark: su SimplerEnv Google Robot la variante senza video raggiunge il 78.4%, contro il 65.2% del modello completo. Sul robot reale il successo scende dal 70% in-distribution al 17% sui task OOD e al 47% sulle nuove disposizioni, indicando limiti nel grounding linguistico e nel trasferimento dei task.
+
+L'[approfondimento su VLA-JEPA](models/vla_jepa/README.md) chiarisce isolamento dei target futuri, teacher forcing, flow matching, protocolli e differenze fra robustezza percettiva e controllo causale.
 
 ## World Model come simulatore ed evaluator
 
