@@ -40,7 +40,7 @@ Il [capitolo sugli ambienti personalizzati](custom_tasks/README.md) introduce i 
 
 Gomma, tessuti e cavi richiedono rappresentazioni più ricche della posa di un corpo rigido. Discretizzazione, modello del materiale e solver diventano parte sostanziale dell'esperimento: una resa visiva plausibile non basta a garantire una risposta fisica adeguata.
 
-Il [capitolo sui deformabili](deformables/README.md) distingue solidi, superfici e cavi, chiarisce i parametri principali e presenta un percorso di verifica basato sulle demo ufficiali.
+Il [capitolo sui deformabili](deformables/README.md) distingue solidi, superfici e cavi, chiarisce i parametri principali e presenta un percorso di verifica basato sulle demo ufficiali. Include inoltre una scena Python con tavolo e oggetti configurabili per forma o asset USD, massa, attrito e proprietà elastiche.
 
 ## Apprendimento e scalabilità
 
@@ -70,6 +70,8 @@ Quando il comportamento osservato è inatteso, occorre poter seguire i dati dal 
 
 Il riferimento software è la **documentazione Isaac Lab 3.0**; per il percorso con l'applicazione completa, la [guida di installazione NVIDIA](https://docs.nvidia.com/isaaclab/3.0/isaac-lab/installation) indica Isaac Sim 6.2. Il nome della directory `isaac_sim_3` è mantenuto come percorso della raccolta: non identifica una release Isaac Sim 3.
 
-Gli script in [`scripts/`](scripts/) mostrano un rollout, una scena di corpi rigidi, una reward personalizzata, la registrazione video e l'accumulo delle metriche episodiche. Sono materiale da verificare nell'ambiente Isaac corrispondente; **la riscrittura dei capitoli non costituisce una validazione runtime su GPU**. I comandi dipendenti dai task e dai preset vanno confrontati con la checkout effettivamente utilizzata.
+Gli esempi Python sono conservati nelle sottocartelle `lab/` dei rispettivi capitoli: [Gymnasium](gymnasium/lab/), [scene e oggetti](scenes_and_objects/lab/), [task personalizzati](custom_tasks/lab/), [deformabili](deformables/lab/) ed [evaluation](evaluation/lab/). Codice, commenti e messaggi degli script sono in inglese; la spiegazione nel capitolo è in italiano.
+
+Gli esempi sono materiale da verificare nell'ambiente Isaac corrispondente; **la riscrittura dei capitoli non costituisce una validazione runtime su GPU**. I comandi dipendenti dai task e dai preset vanno confrontati con la checkout effettivamente utilizzata.
 
 Per la riproducibilità occorre conservare anche la revisione Git del simulatore e del progetto, le configurazioni e le dipendenze risolte. La sola indicazione della famiglia 3.0 non identifica tutte le condizioni dell'esperimento.

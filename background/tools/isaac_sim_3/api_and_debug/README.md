@@ -68,7 +68,7 @@ Un comando di controllo ha uno scopo diverso: imposta target o forze lasciando c
 
 ## Ciclo manuale della simulazione
 
-Lo script [`02_tavolo_oggetti.py`](../scripts/02_tavolo_oggetti.py) costruisce una simulazione senza Gymnasium. Dopo la creazione degli asset e `sim.reset()`, ripete tre operazioni: scrive i dati da applicare con `write_data_to_sim()`, avanza con `sim.step()` e aggiorna gli oggetti con `update(dt)`.
+Lo script [`02_tabletop_objects.py`](../scenes_and_objects/lab/02_tabletop_objects.py) costruisce una simulazione senza Gymnasium. Dopo la creazione degli asset e `sim.reset()`, ripete tre operazioni: scrive i dati da applicare con `write_data_to_sim()`, avanza con `sim.step()` e aggiorna gli oggetti con `update(dt)`.
 
 Questo ciclo permette di isolare la fisica prima di definire reward e terminazioni. Saltare l'aggiornamento può lasciare osservazioni non coerenti con l'ultimo passo; aggiungere chiamate di reset nel punto sbagliato può cancellare il movimento che si intende osservare.
 

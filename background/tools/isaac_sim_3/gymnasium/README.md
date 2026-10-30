@@ -6,7 +6,7 @@ In Isaac Lab l'interfaccia viene usata con **ambienti vettorializzati**, cioè p
 
 ## Costruzione e inizializzazione
 
-L'esempio di accompagnamento è [`01_gym_rollout.py`](../scripts/01_gym_rollout.py), eseguibile dopo la [verifica dell'installazione](../local_installation/README.md). La sua struttura centrale è:
+L'esempio di accompagnamento è [`01_gym_rollout.py`](lab/01_gym_rollout.py), eseguibile dopo la [verifica dell'installazione](../local_installation/README.md). La sua struttura centrale è:
 
 ```python
 cfg, _ = resolve_task_config(

@@ -56,7 +56,7 @@ Cartpole comprende un carrello che si muove lungo una guida e un pendolo collega
 Gli script sono conservati in questa raccolta, mentre i comandi vanno lanciati dalla directory della checkout Isaac Lab. Nei capitoli, `/percorso/vla_wm` indica il percorso assoluto locale del presente repository:
 
 ```bash
-uv run python /percorso/vla_wm/background/tools/isaac_sim_3/scripts/01_gym_rollout.py \
+uv run python /percorso/vla_wm/background/tools/isaac_sim_3/gymnasium/lab/01_gym_rollout.py \
     --num_envs 16 --steps 300 --viz newton_gl
 ```
 

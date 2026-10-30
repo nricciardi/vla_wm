@@ -32,6 +32,10 @@ $$
 
 **I due approcci non sono alternativi**: un agente può utilizzare un World Model per simulare o valutare possibili evoluzioni future e un VLA, o una policy equivalente, per trasformare la decisione finale in azioni robotiche.
 
+## Deployment e adattamento
+
+Il passaggio dal training all'utilizzo richiede di gestire variazioni percettive, disallineamenti hardware ed errori dai quali una policy può non recuperare autonomamente. La raccolta sul [deployment e adattamento dei sistemi robotici](deployment/README.md) introduce AdaJEPA, Self-Adaptive VLA, Back on Track e RoboDoctor, distinguendo aggiornamento del world model, adattamento tramite contesto, pianificazione correttiva e revisione dell'esecuzione con memoria esterna.
+
 ## Background e prerequisiti
 
 Lo studio di VLA e World Model richiede alcuni strumenti comuni: apprendimento da dimostrazioni, Reinforcement Learning, controllo robotico, modelli generativi continui e simulazione di sistemi stocastici. La sezione dedicata ai [background](background/README.md) organizza questi prerequisiti e collega ogni concetto al ruolo che assume nei sistemi discussi nei capitoli principali.

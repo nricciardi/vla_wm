@@ -33,10 +33,10 @@ La [guida ufficiale al workflow Direct](https://docs.nvidia.com/isaaclab/3.0/isa
 
 ## Esempio di reward personalizzata
 
-Lo script [`03_custom_cartpole.py`](../scripts/03_custom_cartpole.py) eredita scena e dinamica dal Cartpole NVIDIA e modifica la durata dell'episodio e la reward. L'esempio isola così la specifica dell'obiettivo senza introdurre contemporaneamente un nuovo robot:
+Lo script [`03_custom_cartpole.py`](lab/03_custom_cartpole.py) eredita scena e dinamica dal Cartpole NVIDIA e modifica la durata dell'episodio e la reward. L'esempio isola così la specifica dell'obiettivo senza introdurre contemporaneamente un nuovo robot:
 
 ```bash
-uv run python /percorso/vla_wm/background/tools/isaac_sim_3/scripts/03_custom_cartpole.py \
+uv run python /percorso/vla_wm/background/tools/isaac_sim_3/custom_tasks/lab/03_custom_cartpole.py \
     --num_envs 8 --viz newton_gl
 ```
 

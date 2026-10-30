@@ -6,7 +6,7 @@ La motivazione è che un cambiamento visuale non coincide necessariamente con un
 
 ## JEPA e il ruolo del futuro
 
-Una **Joint-Embedding Predictive Architecture (JEPA)** confronta la rappresentazione predetta con quella di un target, invece di ricostruire il segnale originale. In VLA-JEPA un encoder **V-JEPA2 congelato** costruisce gli stati latenti; un World Model predice gli stati successivi condizionato da rappresentazioni prodotte dal VLM.
+Una **Joint-Embedding Predictive Architecture (JEPA)** confronta la rappresentazione predetta con quella di un target, invece di ricostruire il segnale originale. In VLA-JEPA un encoder **V-JEPA2 congelato** costruisce gli stati latenti; un World Model predice gli stati successivi condizionato da rappresentazioni prodotte dal VLM. L'[approfondimento su V-JEPA 2](../v_jepa_2/README.md) descrive il pretraining di questo encoder e distingue il planner V-JEPA 2-AC dalla policy qui studiata.
 
 Il target futuro può essere usato per insegnare la predizione senza essere fornito come input al percorso che deve imparare a prevederlo. Questa separazione è centrale: se il modulo che produce una latent action legge già il futuro, può codificarlo direttamente e ottenere una buona loss senza apprendere una rappresentazione utile quando il futuro non è disponibile.
 

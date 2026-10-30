@@ -1,0 +1,51 @@
+{
+  "table": {
+    "size": [1.4, 0.9, 0.1],
+    "center": [0.0, 0.0, 0.75],
+    "static_friction": 0.7,
+    "dynamic_friction": 0.5
+  },
+  "objects": [
+    {
+      "name": "RigidBox",
+      "shape": "box",
+      "deformable": false,
+      "size": [0.16, 0.16, 0.16],
+      "position": [-0.35, 0.0, 0.30],
+      "mass": 0.5,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.5,
+      "color": [0.85, 0.25, 0.15]
+    },
+    {
+      "name": "SoftBox",
+      "shape": "box",
+      "deformable": true,
+      "size": [0.16, 0.16, 0.16],
+      "position": [0.0, 0.0, 0.30],
+      "mass": 0.5,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.5,
+      "youngs_modulus": 10000.0,
+      "poissons_ratio": 0.4,
+      "elasticity_damping": 0.005,
+      "edge_refinement": 4.0,
+      "color": [0.15, 0.55, 0.85]
+    },
+    {
+      "name": "SoftSphere",
+      "shape": "sphere",
+      "deformable": true,
+      "radius": 0.08,
+      "position": [0.35, 0.0, 0.30],
+      "mass": 0.5,
+      "static_friction": 0.7,
+      "dynamic_friction": 0.5,
+      "youngs_modulus": 100000.0,
+      "poissons_ratio": 0.4,
+      "elasticity_damping": 0.005,
+      "edge_refinement": 4.0,
+      "color": [0.2, 0.75, 0.3]
+    }
+  ]
+}

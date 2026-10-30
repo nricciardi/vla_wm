@@ -14,17 +14,19 @@ Un robot richiede una struttura **articolata**, nella quale più corpi sono coll
 
 ## Una scena procedurale con tavolo e cubi
 
-Lo script [`02_tavolo_oggetti.py`](../scripts/02_tavolo_oggetti.py) costruisce una scena tramite primitive geometriche, senza modelli USD esterni. Per il percorso Isaac Sim previsto dall'esempio:
+Lo script [`02_tabletop_objects.py`](lab/02_tabletop_objects.py) costruisce una scena tramite primitive geometriche, senza modelli USD esterni. Per il percorso Isaac Sim previsto dall'esempio:
 
 ```bash
 uv run --extra isaacsim python \
-    /percorso/vla_wm/background/tools/isaac_sim_3/scripts/02_tavolo_oggetti.py \
+    /percorso/vla_wm/background/tools/isaac_sim_3/scenes_and_objects/lab/02_tabletop_objects.py \
     --viz kit --mass 0.5 --friction 0.65
 ```
 
 Il piano del tavolo è un parallelepipedo largo 1.2 m, profondo 0.8 m e spesso 0.10 m. Il centro si trova a quota 0.75 m, quindi la superficie superiore è a 0.80 m. Tre cubi di lato 0.10 m partono più in alto e vengono lasciati cadere.
 
 Il parametro `--mass` stabilisce la massa di base: i tre cubi hanno rispettivamente massa pari a una, due e tre volte questo valore. Lo script modifica le proprietà dei cubi; il materiale della superficie di appoggio deve essere considerato separatamente quando si studia il contatto.
+
+La funzione `create_scene` rende esplicita la costruzione: crea ground e luce, richiama `create_table` e aggiunge i cubi tramite `create_cube`. Quest'ultima riceve posizione, massa, attrito e colore come argomenti, mentre `simulate` contiene soltanto il ciclo di avanzamento e lettura degli stati.
 
 ## Configurazione e creazione degli oggetti
 

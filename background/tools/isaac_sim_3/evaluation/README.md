@@ -36,10 +36,10 @@ Numero di episodi e variabilità vanno riportati insieme alla percentuale. Ripet
 
 Ogni copia possiede il proprio accumulatore di ritorno e durata. Dopo uno `step` si aggiungono reward e un passo; quando `terminated | truncated` è vero per una copia, si salva il risultato e si azzerano soltanto i suoi accumulatori.
 
-Lo script [`05_eval_metrics.py`](../scripts/05_eval_metrics.py) illustra questo meccanismo:
+Lo script [`05_eval_metrics.py`](lab/05_eval_metrics.py) illustra questo meccanismo:
 
 ```bash
-uv run python /percorso/vla_wm/background/tools/isaac_sim_3/scripts/05_eval_metrics.py \
+uv run python /percorso/vla_wm/background/tools/isaac_sim_3/evaluation/lab/05_eval_metrics.py \
     --episodes 100 --num_envs 32
 ```
 
@@ -79,11 +79,11 @@ cfg.video_recorders = [
 
 La configurazione va applicata prima di creare l'ambiente. Il frammento richiede un visualizzatore Kit compatibile; per registrare un sensore si usa una sorgente come `sensor:camera`, con il nome realmente presente nella scena e il canale abilitato.
 
-Lo script [`04_video_gym.py`](../scripts/04_video_gym.py) mostra la registrazione da Kit nel percorso Isaac Sim:
+Lo script [`04_video_gym.py`](lab/04_video_gym.py) mostra la registrazione da Kit nel percorso Isaac Sim:
 
 ```bash
 uv run --extra isaacsim --extra video python \
-    /percorso/vla_wm/background/tools/isaac_sim_3/scripts/04_video_gym.py \
+    /percorso/vla_wm/background/tools/isaac_sim_3/evaluation/lab/04_video_gym.py \
     --viz kit --output videos/tutorial
 ```
 

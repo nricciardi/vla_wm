@@ -327,6 +327,31 @@ Il modello non è condizionato sulle azioni candidate e un video plausibile può
 
 L'[approfondimento su RoboDreamer](models/robodreamer/README.md) sviluppa la composizione probabilistica degli score, l'integrazione delle condizioni multimodali, l'architettura diffusion e i protocolli RT-1 e RLBench.
 
+## Pretraining video e planning nello spazio latente
+
+I video su larga scala permettono di apprendere regolarità visuali senza disporre dei comandi che le hanno prodotte. Per usare queste rappresentazioni nel controllo occorre poi collegare le transizioni alle azioni del robot. Questa famiglia separa quindi **apprendimento del prior visuale** e **apprendimento della dinamica controllabile**, senza richiedere la generazione di immagini durante il planning.
+
+### V-JEPA 2 (2025)
+
+**V-JEPA 2** apprende a predire le rappresentazioni di parti mascherate di un video, evitando la ricostruzione dei pixel. Il pretraining action-free utilizza **VideoMix22M**, una miscela di circa 22 milioni di campioni da Something-Something v2, Kinetics, HowTo100M, YT-Temporal-1B e ImageNet, con una copertura superiore a 1 milione di ore di video. Encoder fino a circa 1B parametri e training a risoluzione spazio-temporale progressiva producono feature utili al riconoscimento del movimento e all'anticipazione. Il modello raggiunge il 77.3% top-1 su SSv2 con un probe supervisionato e 39.7 mean-class recall-at-5 nell'anticipazione delle azioni su Epic-Kitchens-100.
+
+Per il controllo, **V-JEPA 2-AC** congela l'encoder e addestra un nuovo predictor causale su meno di **62 ore di DROID**, circa 23,000 traiettorie con video e stato dell'end-effector, senza usare label di task, reward o successo. Il predictor stima le feature future condizionate da azioni e propriocezione. Un planner **MPC con Cross-Entropy Method** cerca azioni che riducano la distanza latente da un'immagine obiettivo, poi esegue il primo comando e ripianifica.
+
+Gli stessi pesi vengono trasferiti a **Franka Emika Panda con pinze RobotiQ in due laboratori assenti da DROID**, usando una camera RGB monoculare esterna. La media dei due laboratori raggiunge il 100% sul reaching, il 65% sul grasp della tazza e l'80% sul suo pick-and-place; per la scatola, grasp e pick-and-place scendono al 25% e al 65%. Il pick-and-place riceve due subgoal visuali oltre al goal finale. **Zero-shot indica assenza di training nei laboratori di test**, non assenza di dati robotici nel post-training. [Fonte: V-JEPA 2, arXiv v1](https://arxiv.org/abs/2506.09985v1).
+
+#### Novelty
+
+- Scala la **predizione JEPA nello spazio delle feature** con più dati, encoder più grandi e risoluzione progressiva, senza ricostruzione pixel-wise nel pretraining.
+- Trasferisce un encoder video congelato a una **dinamica condizionata dalle azioni** con una quantità relativamente contenuta di dati robotici.
+- Combina **teacher forcing e rollout loss** per addestrare il predictor autoregressivo.
+- Dimostra **planning latente closed loop** su robot fisici in due nuovi laboratori, senza policy appresa per i task di test.
+
+#### Limiti
+
+Il protocollo principale usa un orizzonte di planning di **un solo step**; il pick-and-place dipende da subgoal e tempi di passaggio prestabiliti. La camera viene posizionata manualmente dopo prove preliminari e il modello resta sensibile al punto di vista. Il controllo richiede circa **16 secondi per azione su RTX 4090**, pur risultando molto meno costoso del baseline video generativo studiato. La dinamica deterministica non rappresenta esplicitamente l'incertezza e i risultati coprono pochi task e oggetti, con dieci trial per laboratorio e condizione.
+
+L'[approfondimento esteso su V-JEPA 2](models/v_jepa_2/README.md) sviluppa pretraining, architettura, loss, CEM, protocolli e risultati, distinguendo rappresentazione visuale, anticipazione, planning robotico e rapporto con VLA-JEPA.
+
 ## World Model integrati nella policy
 
 I sistemi più recenti riducono la separazione tra previsione e controllo. Il World Model può condividere il backbone con la policy, interagire con un action expert o comparire come obiettivo ausiliario che induce rappresentazioni sensibili alla dinamica. La sezione confronterà pipeline disaccoppiate, **single-backbone**, Mixture-of-Experts o Mixture-of-Transformers, VLA unificati e modelli predittivi latenti.
