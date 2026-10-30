@@ -472,17 +472,6 @@ DreamGen servirà a esaminare i video World Model come generatori di traiettorie
 
 Cosmos Predict 2.5 rappresenterà i **foundation world model** derivati da grandi video backbone. Il capitolo analizzerà modalità di condizionamento, scalabilità e riuso in sistemi embodied, chiarendo perché una conoscenza video generale non garantisce da sola controllabilità fine, causalità delle azioni o accuratezza nei contatti.
 
-## Altri domini embodied
-
-Manipolazione, navigazione e guida autonoma condividono il bisogno di prevedere il futuro, ma differiscono per action space, geometria, orizzonte e costo dell'errore. Il capitolo userà questi domini come confronto, senza assumere che un'architettura efficace in uno di essi possa essere trasferita direttamente agli altri.
-
-### Navigazione
-
-La sezione discuterà mappe predittive, occupancy, rappresentazioni egocentriche e rollout visuali per scegliere waypoint o traiettorie. Particolare attenzione sarà dedicata alla differenza tra prevedere il movimento dell'agente in una scena relativamente statica e modellare interazioni fisiche con oggetti manipolabili.
-
-### Guida autonoma
-
-La guida autonoma offrirà un caso di world modeling multi-view e multi-agente nel quale occorre prevedere sia il moto dell'ego vehicle sia il comportamento degli altri attori. Saranno confrontate rappresentazioni video, occupancy 3D e token multimodali, insieme ai requisiti di sicurezza e calibrazione dell'incertezza.
 
 ## Dati, benchmark e protocolli di valutazione
 

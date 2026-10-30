@@ -35,3 +35,9 @@ Il relativo [capitolo su Continuous Normalizing Flows e Flow Matching](diffusion
 Una policy robotica non controlla necessariamente i motori in modo diretto. Nella maggior parte dei sistemi produce riferimenti cartesiani o articolari che vengono trasformati in movimento da cinematica inversa, generatori di traiettoria e controller eseguiti a frequenza più elevata. Questa gerarchia spiega perché action space apparentemente simili possano avere significati fisici differenti e perché un VLA in closed loop non sostituisca il servo controller del robot.
 
 L'[approfondimento sul Controllo Robotico](robot_control/README.md) introduce configurazioni articolari e pose cartesiane, cinematica diretta e inversa, Jacobiano, controllo in posizione, velocità e coppia, azioni assolute e relative, generazione delle traiettorie, controller PD/PID, frequenze operative e vincoli di sicurezza.
+
+## Strumenti per la simulazione robotica
+
+Un simulatore rende eseguibili le ipotesi su dinamica, contatti e sensori e permette di raccogliere traiettorie, addestrare policy e valutarne il comportamento in condizioni controllate. Occorre distinguere la descrizione della scena, il motore fisico, le osservazioni fornite all'agente e l'algoritmo di apprendimento: ciascun livello introduce scelte e limiti sperimentali.
+
+Il percorso sugli [strumenti di simulazione](tools/README.md) introduce questi aspetti attraverso Isaac Lab e Isaac Sim, partendo dai fondamenti senza richiedere esperienza con altri simulatori. I capitoli sviluppano installazione, interfaccia Gymnasium, scene e materiali, task personalizzati, training, camere, evaluation ed esecuzione su cluster.
